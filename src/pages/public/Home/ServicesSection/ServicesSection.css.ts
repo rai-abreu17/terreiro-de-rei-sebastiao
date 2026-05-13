@@ -31,9 +31,8 @@ export const servicesSectionContainer = style({
     `radial-gradient(ellipse 55% 50% at 92% 8%, rgba(201, 168, 76, 0.10) 0%, transparent 60%)`,
     `radial-gradient(ellipse 45% 40% at 8% 95%, rgba(13, 31, 60, 0.06) 0%, transparent 55%)`,
     `linear-gradient(175deg, #FFFFFF 0%, #FEFCF8 50%, #FDF9F2 100%)`,
-    `radial-gradient(circle, rgba(201, 168, 76, 0.12) 1px, transparent 1px)`,
   ].join(', '),
-  backgroundSize: ['auto', 'auto', 'auto', '28px 28px'].join(', '),
+  backgroundSize: ['auto', 'auto', 'auto'].join(', '),
 
   /*
    * ESPADAS CRUZADAS — os instrumentos do guerreiro espiritual.
@@ -109,15 +108,14 @@ export const sectionSubtitle = style({
 export const gridContainer = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  gap: tokens.spacing.lg,
+  gap: tokens.spacing.md, // antes lg
   maxWidth: '1200px',
   margin: '0 auto',
   width: '100%',
-
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: tokens.spacing.xl,
+      gap: tokens.spacing.lg, // antes xl
     },
   },
 });
@@ -127,7 +125,6 @@ export const categoriasContainer = style({
   flexDirection: 'column',
   gap: tokens.spacing.xl,
   width: '100%',
-
   '@media': {
     'screen and (min-width: 768px)': {
       gap: '3.5rem',
@@ -140,7 +137,6 @@ export const categoriaBloco = style({
   flexDirection: 'column',
   gap: tokens.spacing.lg,
   width: '100%',
-
   '@media': {
     'screen and (min-width: 768px)': {
       gap: tokens.spacing.xl,

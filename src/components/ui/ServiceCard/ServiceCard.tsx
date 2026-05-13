@@ -22,7 +22,18 @@ export function ServiceCard({
   Icone,
 }: ServiceCardProps): React.ReactElement {
   return (
-    <article className={estaSelecionado ? cardContainerSelecionado : cardContainer}>
+    <article
+      className={estaSelecionado ? cardContainerSelecionado : cardContainer}
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.94)',
+        backdropFilter: 'none',
+        WebkitBackdropFilter: 'none',
+        boxShadow: [
+          `0 6px 20px rgba(13, 31, 60, 0.06)`,
+          `0 1px 0 rgba(255, 255, 255, 0.90) inset`,
+        ].join(', '),
+      }}
+    >
       <div className={iconPlaceholder} aria-hidden="true">
         <div className={iconPlaceholderInner}>
           {Icone ? (

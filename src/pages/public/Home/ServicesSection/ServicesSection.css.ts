@@ -2,12 +2,14 @@ import { style } from '@vanilla-extract/css';
 import { tokens } from '../../../../design-system/tokens.css';
 
 export const servicesSectionContainer = style({
-  position: 'relative',  /* necessário para posicionar ornamentos absolutos */
-  overflow: 'hidden',    /* clips ornamentos que extrapolam a borda */
+  position: 'relative',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
   padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
   backgroundColor: tokens.color.neutral[50],
+  backgroundImage: `radial-gradient(circle, color-mix(in srgb, ${tokens.color.acento.dourado} 13%, transparent) 1px, transparent 1px)`,
+  backgroundSize: '28px 28px',
 
   '@media': {
     'screen and (min-width: 768px)': {

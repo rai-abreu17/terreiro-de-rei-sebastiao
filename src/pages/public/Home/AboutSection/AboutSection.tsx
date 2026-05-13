@@ -1,7 +1,13 @@
 import React from 'react';
 import { DivisorOrnamental } from '../../../../components/ui/DivisorOrnamental/DivisorOrnamental';
 import { OrnatoFlutuante } from '../../../../components/ui/OrnatoFlutuante/OrnatoFlutuante';
-import { IconBengala, IconGuardaSol } from '../../../../assets/icons/SimbolosReiSebastiao';
+import {
+  IconBengala,
+  IconGuardaSol,
+  IconEspadaVermelha,
+  IconCruzCristo,
+  IconToalhaBranca,
+} from '../../../../assets/icons/SimbolosReiSebastiao';
 import { tokens } from '../../../../design-system/tokens.css';
 import {
   aboutContainer,
@@ -11,6 +17,9 @@ import {
   sectionSubtitle,
   sectionParagraph,
   imagePlaceholder,
+  simbolosGrade,
+  simboloItem,
+  simboloRotulo,
 } from './AboutSection.css';
 import type { AboutSectionProps } from './AboutSection.types';
 
@@ -20,11 +29,6 @@ export function AboutSection({
 }: AboutSectionProps): React.ReactElement {
   return (
     <section id="sobre" className={aboutContainer} aria-labelledby="about-title">
-      {/*
-       * Guarda-Sol Cerimonial — flutuando parcialmente fora da borda inferior direita.
-       * Na Encantaria, o guarda-sol protege a cabeça iluminada do Encantado.
-       * Aqui, protege e envolve o espaço de acolhimento da casa.
-       */}
       <OrnatoFlutuante
         Icon={IconGuardaSol}
         tamanho={340}
@@ -35,24 +39,36 @@ export function AboutSection({
         posicao={{ bottom: '-12%', right: '-6%' }}
       />
 
+      {/* Coluna visual: símbolos sagrados do Terreiro */}
       <div className={imageColumn}>
-        <div
-          className={imagePlaceholder}
-          role="img"
-          aria-label="Fotografia do espaço sagrado do Terreiro de Rei Sebastião"
-        >
-          O Terreiro
+        <div className={imagePlaceholder} aria-label="Símbolos sagrados do Terreiro de Rei Sebastião">
+          <div className={simbolosGrade}>
+            <div className={simboloItem}>
+              <IconEspadaVermelha size={48} color={tokens.color.acento.dourado} aria-hidden />
+              <span className={simboloRotulo}>Espada</span>
+            </div>
+            <div className={simboloItem}>
+              <IconCruzCristo size={48} color={tokens.color.acento.dourado} aria-hidden />
+              <span className={simboloRotulo}>Escudo</span>
+            </div>
+            <div className={simboloItem}>
+              <IconGuardaSol size={48} color={tokens.color.acento.dourado} aria-hidden />
+              <span className={simboloRotulo}>Guarda-Sol</span>
+            </div>
+            <div className={simboloItem}>
+              <IconBengala size={48} color={tokens.color.acento.dourado} aria-hidden />
+              <span className={simboloRotulo}>Bengala</span>
+            </div>
+            <div className={simboloItem} style={{ gridColumn: 'span 2' }}>
+              <IconToalhaBranca size={48} color={tokens.color.acento.dourado} aria-hidden />
+              <span className={simboloRotulo}>Toalha Branca</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className={textColumn}>
-        {/* Bengala como divisor ornamental — símbolo do Pai de Terreiro */}
-        <DivisorOrnamental
-          Icon={IconBengala}
-          cor={tokens.color.primaria}
-          tamanhoIcone={20}
-        />
-
+        <DivisorOrnamental Icon={IconBengala} cor={tokens.color.primaria} tamanhoIcone={20} />
         <h2 id="about-title" className={sectionTitle}>{titulo}</h2>
         <p className={sectionSubtitle}>{subtitulo}</p>
 

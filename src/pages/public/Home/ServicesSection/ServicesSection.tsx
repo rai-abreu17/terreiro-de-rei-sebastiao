@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ServiceCard } from '../../../../components/ui/ServiceCard/ServiceCard';
 import { DivisorOrnamental } from '../../../../components/ui/DivisorOrnamental/DivisorOrnamental';
 import { OrnatoFlutuante } from '../../../../components/ui/OrnatoFlutuante/OrnatoFlutuante';
-import { IconEspadaVermelha, IconBengala } from '../../../../assets/icons/SimbolosReiSebastiao';
+import {
+  IconEspadaVermelha,
+  IconBengala,
+  IconGuardaSol,
+  IconCruzCristo,
+} from '../../../../assets/icons/SimbolosReiSebastiao';
 import { usePublicCatalog } from '../../../../hooks/usePublicCatalog';
 import { formatMoney } from '../../../../lib/money';
 import { tokens } from '../../../../design-system/tokens.css';
@@ -19,11 +24,18 @@ import {
   errorText,
 } from './ServicesSection.css';
 
+type IconeProps = { size?: number; color?: string; 'aria-hidden'?: boolean };
+
+const ICONE_POR_CATEGORIA: Record<string, React.ComponentType<IconeProps>> = {
+  consultas: IconEspadaVermelha,
+  rituais: IconGuardaSol,
+};
+
 export function ServicesSection(): React.ReactElement {
   const navigate = useNavigate();
   const { data: catalogo, isLoading, isError } = usePublicCatalog();
   const categoriasVisiveis =
-    catalogo?.gruposPorCategoria.filter((grupo) => getCategoryContent(grupo.categoria.slug)) ?? [];
+    catalogo?.gruposPorCategoria.filter((g) => getCategoryContent(g.categoria.slug)) ?? [];
 
   const handleSaibaMais = (slugCategoria: string) => {
     navigate(`/servicos/${slugCategoria}`);
@@ -31,10 +43,6 @@ export function ServicesSection(): React.ReactElement {
 
   return (
     <section id="servicos" className={servicesSectionContainer} aria-labelledby="services-title">
-      {/*
-       * Bengala — cetro patriarcal flutuando no canto inferior direito como
-       * presença silenciosa do Rei que guia os trabalhos oferecidos.
-       */}
       <OrnatoFlutuante
         Icon={IconBengala}
         tamanho={280}
@@ -44,9 +52,17 @@ export function ServicesSection(): React.ReactElement {
         atraso="2s"
         posicao={{ bottom: '-8%', right: '-4%' }}
       />
+      <OrnatoFlutuante
+        Icon={IconCruzCristo}
+        tamanho={200}
+        cor={tokens.color.secundaria}
+        opacidade={0.04}
+        variante="a"
+        atraso="1s"
+        posicao={{ top: '-5%', left: '-3%' }}
+      />
 
       <div className={sectionHeader}>
-        {/* Espada ornamental como divisor — os trabalhos são conduzidos sob a espada do Rei */}
         <DivisorOrnamental
           Icon={IconEspadaVermelha}
           cor={tokens.color.acento.dourado}
@@ -78,16 +94,15 @@ export function ServicesSection(): React.ReactElement {
           <div className={gridContainer}>
             {categoriasVisiveis.map((grupo) => {
               const conteudo = getCategoryContent(grupo.categoria.slug);
+              if (!conteudo) return null;
 
-              if (!conteudo) {
-                return null;
-              }
-
-              const menorPreco = Math.min(...grupo.servicos.map((servico) => servico.priceCents));
+              const menorPreco = Math.min(...grupo.servicos.map((s) => s.priceCents));
               const resumoQuantidade =
                 grupo.servicos.length === 1
                   ? '1 trabalho disponível'
                   : `${grupo.servicos.length} trabalhos disponíveis`;
+
+              const Icone = ICONE_POR_CATEGORIA[grupo.categoria.slug] ?? IconBengala;
 
               return (
                 <ServiceCard
@@ -97,6 +112,7 @@ export function ServicesSection(): React.ReactElement {
                   precoFormatado={`A partir de ${formatMoney(menorPreco)}`}
                   duracaoFormatada={resumoQuantidade}
                   rotuloBotao="Saiba mais"
+                  Icone={Icone}
                   aoClicarAgendar={() => handleSaibaMais(grupo.categoria.slug)}
                 />
               );
@@ -106,9 +122,7 @@ export function ServicesSection(): React.ReactElement {
       )}
 
       {!isLoading && !isError && categoriasVisiveis.length === 0 && (
-        <div className={messageContainer}>
-          Nenhum serviço disponível no momento.
-        </div>
+        <div className={messageContainer}>Nenhum serviço disponível no momento.</div>
       )}
     </section>
   );

@@ -14,7 +14,7 @@ export const aboutContainer = style({
       flexDirection: 'row',
       alignItems: 'center',
       padding: `80px ${tokens.spacing.xl}`,
-      gap: tokens.spacing.xl,
+      gap: '3rem',
     },
   },
 });
@@ -79,77 +79,48 @@ export const sectionParagraph = style({
   },
 });
 
-// ── Painel de símbolos decorativos ────────────────────────────────────────────
+// ── Frame da foto ─────────────────────────────────────────────────────────────
 
-export const imagePlaceholder = style({
-  width: '100%',
-  maxWidth: '420px',
-  minHeight: '420px',
-  background: `linear-gradient(145deg, ${tokens.color.secundaria} 0%, color-mix(in srgb, ${tokens.color.secundaria} 85%, ${tokens.color.primaria}) 100%)`,
-  borderRadius: '24px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: tokens.spacing.xl,
-  boxShadow: `0 24px 60px color-mix(in srgb, ${tokens.color.secundaria} 25%, transparent)`,
+export const fotoFrame = style({
   position: 'relative',
+  width: '100%',
+  maxWidth: '440px',
 
+  // Cantos decorativos dourados
   selectors: {
     '&::before': {
       content: '""',
       position: 'absolute',
-      inset: 0,
-      borderRadius: '24px',
-      background: `radial-gradient(ellipse at 30% 30%, color-mix(in srgb, ${tokens.color.acento.dourado} 10%, transparent), transparent 60%)`,
-      pointerEvents: 'none',
+      top: '-10px',
+      left: '-10px',
+      width: '60px',
+      height: '60px',
+      borderTop: `3px solid ${tokens.color.acento.dourado}`,
+      borderLeft: `3px solid ${tokens.color.acento.dourado}`,
+      borderRadius: `${tokens.radius.sm} 0 0 0`,
+      zIndex: 1,
     },
     '&::after': {
       content: '""',
       position: 'absolute',
-      bottom: '-14px',
-      right: '-14px',
-      width: '90px',
-      height: '90px',
-      borderBottom: `4px solid ${tokens.color.acento.dourado}`,
-      borderRight: `4px solid ${tokens.color.acento.dourado}`,
-      borderRadius: `0 0 16px 0`,
+      bottom: '-10px',
+      right: '-10px',
+      width: '60px',
+      height: '60px',
+      borderBottom: `3px solid ${tokens.color.acento.dourado}`,
+      borderRight: `3px solid ${tokens.color.acento.dourado}`,
+      borderRadius: `0 0 ${tokens.radius.sm} 0`,
+      zIndex: 1,
     },
   },
 });
 
-export const simbolosGrade = style({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, 1fr)',
-  gap: tokens.spacing.xl,
-  position: 'relative',
-  zIndex: 1,
+export const fotoPlaceholder = style({
   width: '100%',
-});
-
-export const simboloItem = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: tokens.spacing.sm,
-  padding: tokens.spacing.lg,
+  aspectRatio: '4 / 5',
   borderRadius: '16px',
-  backgroundColor: `color-mix(in srgb, ${tokens.color.texto.invertido} 5%, transparent)`,
-  border: `1px solid color-mix(in srgb, ${tokens.color.acento.dourado} 20%, transparent)`,
-  transition: `background-color ${tokens.motion.fast} ease`,
-
-  selectors: {
-    '&:hover': {
-      backgroundColor: `color-mix(in srgb, ${tokens.color.texto.invertido} 10%, transparent)`,
-    },
-  },
-});
-
-export const simboloRotulo = style({
-  fontFamily: tokens.font.family.corpo,
-  fontSize: '0.7rem',
-  color: `color-mix(in srgb, ${tokens.color.acento.dourado} 80%, transparent)`,
-  fontWeight: tokens.font.weight.semibold,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
-  textAlign: 'center',
+  backgroundColor: tokens.color.neutral[200],
+  backgroundImage: `linear-gradient(135deg, ${tokens.color.neutral[50]} 0%, ${tokens.color.neutral[200]} 100%)`,
+  boxShadow: `0 24px 60px color-mix(in srgb, ${tokens.color.secundaria} 18%, transparent)`,
+  display: 'block',
 });

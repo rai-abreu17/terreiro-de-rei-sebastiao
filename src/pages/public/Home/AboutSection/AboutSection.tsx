@@ -6,7 +6,6 @@ import {
   IconGuardaSol,
   IconEspadaVermelha,
   IconCruzCristo,
-  IconToalhaBranca,
 } from '../../../../assets/icons/SimbolosReiSebastiao';
 import { tokens } from '../../../../design-system/tokens.css';
 import {
@@ -16,10 +15,8 @@ import {
   sectionTitle,
   sectionSubtitle,
   sectionParagraph,
-  imagePlaceholder,
-  simbolosGrade,
-  simboloItem,
-  simboloRotulo,
+  fotoFrame,
+  fotoPlaceholder,
 } from './AboutSection.css';
 import type { AboutSectionProps } from './AboutSection.types';
 
@@ -38,32 +35,25 @@ export function AboutSection({
         atraso="1s"
         posicao={{ bottom: '-12%', right: '-6%' }}
       />
+      <OrnatoFlutuante
+        Icon={IconCruzCristo}
+        tamanho={160}
+        cor={tokens.color.primaria}
+        opacidade={0.04}
+        variante="a"
+        atraso="2s"
+        posicao={{ top: '-5%', left: '-2%' }}
+      />
 
-      {/* Coluna visual: símbolos sagrados do Terreiro */}
+      {/* Coluna da foto */}
       <div className={imageColumn}>
-        <div className={imagePlaceholder} aria-label="Símbolos sagrados do Terreiro de Rei Sebastião">
-          <div className={simbolosGrade}>
-            <div className={simboloItem}>
-              <IconEspadaVermelha size={48} color={tokens.color.acento.dourado} aria-hidden />
-              <span className={simboloRotulo}>Espada</span>
-            </div>
-            <div className={simboloItem}>
-              <IconCruzCristo size={48} color={tokens.color.acento.dourado} aria-hidden />
-              <span className={simboloRotulo}>Escudo</span>
-            </div>
-            <div className={simboloItem}>
-              <IconGuardaSol size={48} color={tokens.color.acento.dourado} aria-hidden />
-              <span className={simboloRotulo}>Guarda-Sol</span>
-            </div>
-            <div className={simboloItem}>
-              <IconBengala size={48} color={tokens.color.acento.dourado} aria-hidden />
-              <span className={simboloRotulo}>Bengala</span>
-            </div>
-            <div className={simboloItem} style={{ gridColumn: 'span 2' }}>
-              <IconToalhaBranca size={48} color={tokens.color.acento.dourado} aria-hidden />
-              <span className={simboloRotulo}>Toalha Branca</span>
-            </div>
-          </div>
+        <div className={fotoFrame}>
+          {/* Substitua esta div por <img src="..." alt="..." /> quando a foto estiver pronta */}
+          <div
+            className={fotoPlaceholder}
+            role="img"
+            aria-label="Fotografia do espaço sagrado do Terreiro de Rei Sebastião"
+          />
         </div>
       </div>
 

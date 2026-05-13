@@ -5,18 +5,20 @@ import { svgEspadasCruzadas } from '../../../../assets/svgs/marcasDaguaSVG';
 export const servicesSectionContainer = style({
   position: 'relative',
   /*
-   * overflow: visible — necessário para as Espadas Cruzadas (::before) sangrarem
-   * além das bordas esquerda e inferior. O homeContainer tem overflow-x: hidden
-   * que previne scroll horizontal. O sangramento inferior vai até a onda do CTA.
+   * overflow: hidden — essencial para que o background cream (#FEFCF8) preencha
+   * todo o box da seção até a borda inferior, evitando que o homeContainer branco
+   * apareça entre ServicesSection e a DivisorOnda abaixo.
+   * As Espadas Cruzadas (::before) sangram apenas para fora da borda esquerda,
+   * sendo clipadas aqui — o resultado visual é intencional: saem da parede.
    */
-  overflow: 'visible',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
   /*
    * paddingTop reduzido: a onda SVG já cria espaçamento visual no topo.
    * O padding real da seção começa após a onda.
    */
-  padding: `${tokens.spacing.xl} ${tokens.spacing.lg} 80px`,
+  padding: `${tokens.spacing.xl} ${tokens.spacing.lg} 48px`,
   /*
    * Fundo em camadas — as dunas dos Lençóis Maranhenses:
    * 1. Halo dourado suave no canto superior direito (sol sobre as dunas)
@@ -60,7 +62,7 @@ export const servicesSectionContainer = style({
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `48px ${tokens.spacing.xl} 96px`,
+      padding: `48px ${tokens.spacing.xl} 56px`,
     },
   },
 });

@@ -10,7 +10,13 @@ export const faqSectionContainer = style({
   
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `80px ${tokens.spacing.xl}`,
+      /*
+       * paddingTop reduzido de 80px para 40px: nas páginas de serviço
+       * (ServiceCategoryPage, ServiceDetailPage) a FaqSection fica diretamente
+       * após DivisorOnda (carmesim→branco). Manter 80px criava espaçamento
+       * branco excessivo após a onda. Na Home o efeito é igualmente positivo.
+       */
+      padding: `40px ${tokens.spacing.xl} 80px`,
     },
   },
 });

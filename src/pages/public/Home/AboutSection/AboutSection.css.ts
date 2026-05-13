@@ -56,7 +56,12 @@ export const aboutContainer = style({
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: `80px ${tokens.spacing.xl}`,
+      /*
+       * paddingTop reduzido de 80px para 40px: o DivisorOnda acima já fornece
+       * ~40px de separação visual. Manter 80px somava ~120px de branco antes
+       * do conteúdo, criando o espaçamento excessivo reportado.
+       */
+      padding: `40px ${tokens.spacing.xl} 80px`,
       gap: '3rem',
     },
   },

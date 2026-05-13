@@ -161,7 +161,7 @@ export function ServiceDetailPage(): React.ReactElement {
       </section>
 
       {/* Onda 1 — Oceano → Luz */}
-      <DivisorOnda corTopo={COR.heroNavy} corFundo={COR.branco} variante="a" altura={90} />
+      <DivisorOnda corTopo={COR.heroNavy} corFundo={COR.branco} variante="a" altura={64} />
 
       {/* ── Como é feito ──────────────────────────────────────────────────── */}
       <section id="sobre" className={styles.section}>
@@ -248,7 +248,7 @@ export function ServiceDetailPage(): React.ReactElement {
       </section>
 
       {/* Onda 2 — Luz → Manto: branco cede ao carmesim dos Depoimentos */}
-      <DivisorOnda corTopo={COR.branco} corFundo={COR.vinho} variante="b" altura={100} invertido />
+      <DivisorOnda corTopo={COR.branco} corFundo={COR.vinho} variante="b" altura={72} invertido />
 
       {/* ── Depoimentos ──────────────────────────────────────────────────── */}
       <section className={styles.sectionDark}>
@@ -295,7 +295,7 @@ export function ServiceDetailPage(): React.ReactElement {
       </section>
 
       {/* Onda 3 — Manto → Ritual: carmesim abre para o branco das perguntas */}
-      <DivisorOnda corTopo={COR.vinho} corFundo={COR.branco} variante="c" altura={90} />
+      <DivisorOnda corTopo={COR.vinho} corFundo={COR.branco} variante="c" altura={64} />
 
       <FaqSection titulo={conteudoServico.faqTitulo} itensFaq={conteudoServico.faqItens} />
 

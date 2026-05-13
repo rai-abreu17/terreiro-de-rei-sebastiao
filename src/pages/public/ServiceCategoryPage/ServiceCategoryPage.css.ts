@@ -239,12 +239,13 @@ export const primaryAction = style({
 // ── Seções ────────────────────────────────────────────────────────────────────
 
 export const section = style({
-  padding: `72px ${tokens.spacing.lg}`,
+  padding: `56px ${tokens.spacing.lg}`,
   position: 'relative',
   overflow: 'hidden',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `88px ${tokens.spacing.xl}`,
+      /* Reduzido de 88px: ondas acima/abaixo já fornecem separação visual */
+      padding: `64px ${tokens.spacing.xl}`,
     },
   },
 });

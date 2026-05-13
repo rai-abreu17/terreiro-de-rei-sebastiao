@@ -27,7 +27,7 @@ const COR = {
   heroNavy: '#0D1F3C',   // heroSection: tokens.color.secundaria (base do gradiente)
   branco: '#FFFFFF',     // section: tokens.color.fundo
   cremeSuave: '#F9F7F5', // sectionAlt: tokens.color.neutral[50]
-  vinho: '#6B1A1A',      // sectionDark: tokens.color.primaria
+  vinho: '#6B1A1A',      // sectionDark: backgroundColor exato (tokens.color.primaria)
 } as const;
 
 function resolverResumoModalidades(modalidades: readonly string[]): string {
@@ -148,7 +148,7 @@ export function ServiceCategoryPage(): React.ReactElement {
       </section>
 
       {/* Onda 1 — Oceano → Luz: o Hero naval abre-se para o conteúdo */}
-      <DivisorOnda corTopo={COR.heroNavy} corFundo={COR.branco} variante="a" altura={90} />
+      <DivisorOnda corTopo={COR.heroNavy} corFundo={COR.branco} variante="a" altura={64} />
 
       {/* ── Como é feito ──────────────────────────────────────────────────── */}
       <section id="sobre" className={styles.section}>
@@ -275,7 +275,7 @@ export function ServiceCategoryPage(): React.ReactElement {
       </section>
 
       {/* Onda 2 — Dunas → Manto: areia cede ao carmesim dos Depoimentos */}
-      <DivisorOnda corTopo={COR.cremeSuave} corFundo={COR.vinho} variante="b" altura={100} invertido />
+      <DivisorOnda corTopo={COR.cremeSuave} corFundo={COR.vinho} variante="b" altura={72} invertido />
 
       {/* ── Depoimentos ──────────────────────────────────────────────────── */}
       <section className={styles.sectionDark}>
@@ -322,7 +322,7 @@ export function ServiceCategoryPage(): React.ReactElement {
       </section>
 
       {/* Onda 3 — Manto → Ritual: carmesim abre para o branco das perguntas */}
-      <DivisorOnda corTopo={COR.vinho} corFundo={COR.branco} variante="c" altura={90} />
+      <DivisorOnda corTopo={COR.vinho} corFundo={COR.branco} variante="c" altura={64} />
 
       <FaqSection titulo={conteudo.faqTitulo} itensFaq={conteudo.faqItens} />
 

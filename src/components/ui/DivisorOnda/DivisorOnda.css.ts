@@ -5,10 +5,13 @@ export const ondaWrapper = style({
   lineHeight: 0,
   overflow: 'hidden',
   /*
-   * marginTop negativo: puxa a onda 1px para dentro da seção acima,
-   * eliminando a fresta de 1px que alguns browsers renderizam entre blocos.
+   * Margens negativas bilaterais: eliminam a fresta de 1-2px que alguns
+   * browsers renderizam entre blocos em layout flex. O -1px no topo puxa a
+   * onda para dentro da seção acima; o -2px no fundo puxa a seção seguinte
+   * para dentro da onda, garantindo cobertura total sem espaço branco visível.
    */
   marginTop: '-1px',
+  marginBottom: '-2px',
   pointerEvents: 'none',
   userSelect: 'none',
   flexShrink: 0,

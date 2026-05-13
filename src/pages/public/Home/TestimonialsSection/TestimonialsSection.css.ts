@@ -16,11 +16,12 @@ export const container = style({
     `radial-gradient(ellipse 60% 60% at 0% 110%, rgba(0, 0, 0, 0.30) 0%, transparent 55%)`,
     `linear-gradient(155deg, #7A1518 0%, ${tokens.color.primaria} 35%, #4A0A0F 70%, #320608 100%)`,
   ].join(', '),
-  padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
+  padding: `${tokens.spacing.xl} ${tokens.spacing.lg} 48px`,
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `80px ${tokens.spacing.xl}`,
+      /* paddingBottom reduzido: onda abaixo fornece separação visual */
+      padding: `80px ${tokens.spacing.xl} 56px`,
     },
   },
 });

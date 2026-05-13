@@ -22,8 +22,13 @@ const COR = {
   oceanoNoturno: '#06101F',
   /** Serviços: areia dos Lençóis — base quente do ServicesSection */
   areiaLencois: '#FEFCF8',
-  /** CTA / Depoimentos: vinho carmesim — base do gradiente escarlate */
-  vinhoEscarlate: '#3E0709',
+  /**
+   * CTA / Depoimentos: vermelho-vinho — corresponde ao `backgroundColor` declarado
+   * em TestimonialsSection e ContactCTA (tokens.color.primaria).
+   * Usar o backgroundColor declarado (não o endpoint do gradiente) garante que
+   * o corTopo da onda seja visualmente contínuo com o fundo real da seção.
+   */
+  vinhoEscarlate: '#6B1A1A',
   /** Sobre: branco puro */
   brancoRitual: '#FFFFFF',
   /** Contato: creme suave — neutral[50] */
@@ -90,7 +95,7 @@ export function Home(): React.ReactElement {
         corTopo={COR.oceanoNoturno}
         corFundo={COR.areiaLencois}
         variante="a"
-        altura={90}
+        altura={64}
       />
 
       <ServicesSection />
@@ -104,7 +109,7 @@ export function Home(): React.ReactElement {
         corTopo={COR.areiaLencois}
         corFundo={COR.vinhoEscarlate}
         variante="b"
-        altura={100}
+        altura={72}
         invertido
       />
 
@@ -120,7 +125,7 @@ export function Home(): React.ReactElement {
         corTopo={COR.vinhoEscarlate}
         corFundo={COR.brancoRitual}
         variante="c"
-        altura={90}
+        altura={64}
       />
 
       <AboutSection />
@@ -135,7 +140,7 @@ export function Home(): React.ReactElement {
         corTopo={COR.brancoRitual}
         corFundo={COR.cremeSuave}
         variante="d"
-        altura={70}
+        altura={52}
         invertido
       />
 

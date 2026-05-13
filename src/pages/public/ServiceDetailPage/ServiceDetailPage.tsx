@@ -7,6 +7,8 @@ import {
   IconCruzCristo,
   IconEspadaVermelha,
   IconGuardaSol,
+  IconTambor,
+  IconToalhaBranca,
 } from '../../../assets/icons/SimbolosReiSebastiao';
 import { tokens } from '../../../design-system/tokens.css';
 import { usePublicCatalog } from '../../../hooks/usePublicCatalog';
@@ -21,19 +23,9 @@ import * as styles from '../ServiceCategoryPage/ServiceCategoryPage.css';
 
 function resolverResumoModalidades(modalidades: readonly string[]): string {
   const conjunto = new Set(modalidades);
-
-  if (conjunto.has('ONLINE') && conjunto.has('IN_PERSON')) {
-    return 'Online e presencial';
-  }
-
-  if (conjunto.has('ONLINE')) {
-    return 'Online';
-  }
-
-  if (conjunto.has('IN_PERSON')) {
-    return 'Presencial';
-  }
-
+  if (conjunto.has('ONLINE') && conjunto.has('IN_PERSON')) return 'Online e presencial';
+  if (conjunto.has('ONLINE')) return 'Online';
+  if (conjunto.has('IN_PERSON')) return 'Presencial';
   return 'Sob consulta';
 }
 
@@ -44,19 +36,12 @@ export function ServiceDetailPage(): React.ReactElement {
   }>();
   const { data: catalogo, isLoading, isError } = usePublicCatalog();
 
-  if (!categorySlug || !serviceSlug) {
-    return <Navigate to="/" replace />;
-  }
+  if (!categorySlug || !serviceSlug) return <Navigate to="/" replace />;
 
   const conteudoCategoria = getCategoryContent(categorySlug);
-  const conteudoServico = getServiceContent(
-    serviceSlug,
-    categorySlug as CategoriaPublicaSlug
-  );
+  const conteudoServico = getServiceContent(serviceSlug, categorySlug as CategoriaPublicaSlug);
 
-  if (!conteudoCategoria || !conteudoServico) {
-    return <Navigate to="/" replace />;
-  }
+  if (!conteudoCategoria || !conteudoServico) return <Navigate to="/" replace />;
 
   if (isLoading) {
     return (
@@ -71,7 +56,7 @@ export function ServiceDetailPage(): React.ReactElement {
   }
 
   const grupoCategoria =
-    catalogo?.gruposPorCategoria.find((grupo) => grupo.categoria.slug === categorySlug) ?? null;
+    catalogo?.gruposPorCategoria.find((g) => g.categoria.slug === categorySlug) ?? null;
   const servico = grupoCategoria?.servicos.find((item) => item.slug === serviceSlug) ?? null;
 
   if (isError || !grupoCategoria || !servico) {
@@ -82,6 +67,8 @@ export function ServiceDetailPage(): React.ReactElement {
 
   return (
     <div className={styles.pageContainer}>
+
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className={styles.heroSection}>
         <OrnatoFlutuante
           Icon={IconEspadaVermelha}
@@ -101,14 +88,20 @@ export function ServiceDetailPage(): React.ReactElement {
           atraso="2s"
           posicao={{ bottom: '-10%', right: '-2%' }}
         />
+        <OrnatoFlutuante
+          Icon={IconBengala}
+          tamanho={130}
+          cor={tokens.color.acento.dourado}
+          opacidade={0.07}
+          variante="c"
+          atraso="1s"
+          posicao={{ top: '55%', left: '38%' }}
+        />
 
         <div className={styles.heroGrid}>
           <div className={styles.heroContent}>
-            <Link
-              to={`/servicos/${categorySlug}#servicos`}
-              className={styles.backLink}
-            >
-              Voltar aos serviços da categoria
+            <Link to={`/servicos/${categorySlug}#servicos`} className={styles.backLink}>
+              ← Voltar aos serviços da categoria
             </Link>
             <p className={styles.eyebrow}>{grupoCategoria.categoria.name}</p>
             <h1 className={styles.heroTitle}>{servico.name}</h1>
@@ -116,13 +109,14 @@ export function ServiceDetailPage(): React.ReactElement {
 
             <div className={styles.signalsBlock}>
               <h2 className={styles.signalsTitle}>Talvez este trabalho faça sentido porque...</h2>
-              <ul className={styles.signalsList}>
-                {conteudoServico.sinais.map((sinal) => (
-                  <li key={sinal} className={styles.signalItem}>
-                    {sinal}
-                  </li>
+              <div className={styles.sinaisContainer}>
+                {conteudoServico.sinais.map((sinal, i) => (
+                  <div key={sinal} className={styles.signalItemWrapper}>
+                    <span className={styles.signalNumero} aria-hidden="true">{i + 1}</span>
+                    <p className={styles.signalItemTexto}>{sinal}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
 
@@ -145,40 +139,39 @@ export function ServiceDetailPage(): React.ReactElement {
               </div>
             </div>
 
-            <Link
-              to={`/agendar?servicoId=${servico.id}`}
-              className={styles.primaryAction}
-            >
+            <Link to={`/agendar?servicoId=${servico.id}`} className={styles.primaryAction}>
               Agendar agora
             </Link>
           </aside>
         </div>
       </section>
 
+      {/* ── Como é feito ──────────────────────────────────────────────────── */}
       <section id="sobre" className={styles.section}>
+        <OrnatoFlutuante
+          Icon={IconCruzCristo}
+          tamanho={180}
+          cor={tokens.color.primaria}
+          opacidade={0.04}
+          variante="b"
+          atraso="0.5s"
+          posicao={{ bottom: '-5%', right: '-3%' }}
+        />
         <div className={styles.sectionInner}>
           <div className={styles.sectionGrid}>
             <div className={styles.richTextBlock}>
-              <DivisorOrnamental
-                Icon={IconBengala}
-                cor={tokens.color.primaria}
-                tamanhoIcone={20}
-              />
+              <DivisorOrnamental Icon={IconBengala} cor={tokens.color.primaria} tamanhoIcone={20} />
               <h2 className={styles.sectionTitle}>{conteudoServico.comoTitulo}</h2>
-              {conteudoServico.comoParagrafos.map((paragrafo) => (
-                <p key={paragrafo} className={styles.sectionParagraph}>
-                  {paragrafo}
-                </p>
+              {conteudoServico.comoParagrafos.map((p) => (
+                <p key={p} className={styles.sectionParagraph}>{p}</p>
               ))}
             </div>
 
             <aside className={styles.topicsPanel}>
               <h3 className={styles.topicsTitle}>{conteudoServico.tematicasTitulo}</h3>
               <div className={styles.topicsGrid}>
-                {conteudoServico.tematicas.map((tematica) => (
-                  <span key={tematica} className={styles.topicChip}>
-                    {tematica}
-                  </span>
+                {conteudoServico.tematicas.map((t) => (
+                  <span key={t} className={styles.topicChip}>{t}</span>
                 ))}
               </div>
             </aside>
@@ -186,20 +179,29 @@ export function ServiceDetailPage(): React.ReactElement {
         </div>
       </section>
 
+      {/* ── Como funciona ─────────────────────────────────────────────────── */}
       <section className={styles.sectionAlt}>
+        <OrnatoFlutuante
+          Icon={IconGuardaSol}
+          tamanho={170}
+          cor={tokens.color.secundaria}
+          opacidade={0.04}
+          variante="a"
+          atraso="1s"
+          posicao={{ top: '-5%', left: '-3%' }}
+        />
         <div className={styles.sectionInner}>
           <div className={styles.richTextBlock}>
-            <DivisorOrnamental
-              Icon={IconCruzCristo}
-              cor={tokens.color.acento.dourado}
-              tamanhoIcone={20}
-            />
+            <DivisorOrnamental Icon={IconCruzCristo} cor={tokens.color.acento.dourado} tamanhoIcone={20} />
             <h2 className={styles.sectionTitle}>{conteudoServico.funcionamentoTitulo}</h2>
           </div>
 
           <div className={styles.highlightsGrid}>
-            {conteudoServico.funcionamentoCards.map((item) => (
+            {conteudoServico.funcionamentoCards.map((item, i) => (
               <article key={`${item.rotulo}-${item.valor}`} className={styles.highlightCard}>
+                <span className={styles.highlightNumero} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <p className={styles.highlightLabel}>{item.rotulo}</p>
                 <p className={styles.highlightValue}>{item.valor}</p>
               </article>
@@ -208,11 +210,15 @@ export function ServiceDetailPage(): React.ReactElement {
         </div>
       </section>
 
+      {/* ── Observação + Quem conduz ─────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.sectionInner}>
           <div className={styles.sectionGrid}>
-            <div className={styles.richTextBlock}>
-              <h2 className={styles.sectionTitle}>{conteudoServico.observacaoTitulo}</h2>
+            <div className={styles.observacaoCard}>
+              <div className={styles.observacaoIcone}>
+                <IconCruzCristo size={18} color={tokens.color.acento.dourado} aria-hidden />
+                {conteudoServico.observacaoTitulo}
+              </div>
               <p className={styles.sectionParagraph}>{conteudoServico.observacaoTexto}</p>
             </div>
 
@@ -224,9 +230,29 @@ export function ServiceDetailPage(): React.ReactElement {
         </div>
       </section>
 
+      {/* ── Depoimentos ──────────────────────────────────────────────────── */}
       <section className={styles.sectionDark}>
+        <OrnatoFlutuante
+          Icon={IconTambor}
+          tamanho={240}
+          cor={tokens.color.texto.invertido}
+          opacidade={0.05}
+          variante="c"
+          atraso="0s"
+          posicao={{ bottom: '-8%', right: '-3%' }}
+        />
+        <OrnatoFlutuante
+          Icon={IconEspadaVermelha}
+          tamanho={150}
+          cor={tokens.color.acento.dourado}
+          opacidade={0.06}
+          variante="a"
+          atraso="1.5s"
+          posicao={{ top: '-6%', left: '-2%' }}
+        />
         <div className={styles.sectionInner}>
           <div className={styles.richTextBlock}>
+            <DivisorOrnamental Icon={IconToalhaBranca} cor={tokens.color.acento.dourado} tamanhoIcone={22} />
             <h2 className={styles.sectionTitleDark}>Depoimentos</h2>
             <p className={styles.sectionParagraphDark}>
               Palavras de quem encontrou acolhimento, clareza e direção na Casa.
@@ -236,35 +262,32 @@ export function ServiceDetailPage(): React.ReactElement {
           <div className={styles.testimonialsGrid}>
             {conteudoCategoria.depoimentos.map((depoimento) => (
               <article key={`${depoimento.autor}-${depoimento.texto}`} className={styles.testimonialCard}>
-                <p className={styles.testimonialText}>“{depoimento.texto}”</p>
-                <span className={styles.testimonialAuthor}>{depoimento.autor}</span>
+                <span className={styles.aspasDecorative} aria-hidden="true">"</span>
+                <p className={styles.testimonialText}>{depoimento.texto}</p>
+                <footer className={styles.testimonialFooter}>
+                  <span className={styles.testimonialTraco} aria-hidden="true">—</span>
+                  <span className={styles.testimonialAuthor}>{depoimento.autor}</span>
+                </footer>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <FaqSection
-        titulo={conteudoServico.faqTitulo}
-        itensFaq={conteudoServico.faqItens}
-      />
+      <FaqSection titulo={conteudoServico.faqTitulo} itensFaq={conteudoServico.faqItens} />
 
+      {/* ── CTA final ─────────────────────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.sectionInner}>
           <div className={styles.ctaCard}>
+            <DivisorOrnamental Icon={IconBengala} cor={tokens.color.acento.dourado} tamanhoIcone={20} />
             <h2 className={styles.sectionTitleDark}>{conteudoServico.ctaTitulo}</h2>
             <p className={styles.sectionParagraphDark}>{conteudoServico.ctaTexto}</p>
             <div className={styles.ctaActions}>
-              <Link
-                to={`/agendar?servicoId=${servico.id}`}
-                className={styles.primaryAction}
-              >
+              <Link to={`/agendar?servicoId=${servico.id}`} className={styles.primaryAction}>
                 Agendar agora
               </Link>
-              <Link
-                to={`/servicos/${categorySlug}#servicos`}
-                className={styles.secondaryAction}
-              >
+              <Link to={`/servicos/${categorySlug}#servicos`} className={styles.secondaryAction}>
                 Ver outros serviços desta categoria
               </Link>
             </div>

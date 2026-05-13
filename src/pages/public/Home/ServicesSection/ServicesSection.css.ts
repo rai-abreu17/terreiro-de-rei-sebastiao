@@ -1,19 +1,66 @@
 import { style } from '@vanilla-extract/css';
 import { tokens } from '../../../../design-system/tokens.css';
+import { svgEspadasCruzadas } from '../../../../assets/svgs/marcasDaguaSVG';
 
 export const servicesSectionContainer = style({
   position: 'relative',
-  overflow: 'hidden',
+  /*
+   * overflow: visible — necessário para as Espadas Cruzadas (::before) sangrarem
+   * além das bordas esquerda e inferior. O homeContainer tem overflow-x: hidden
+   * que previne scroll horizontal. O sangramento inferior vai até a onda do CTA.
+   */
+  overflow: 'visible',
   display: 'flex',
   flexDirection: 'column',
-  padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
-  backgroundColor: tokens.color.neutral[50],
-  backgroundImage: `radial-gradient(circle, color-mix(in srgb, ${tokens.color.acento.dourado} 13%, transparent) 1px, transparent 1px)`,
-  backgroundSize: '28px 28px',
+  /*
+   * paddingTop reduzido: a onda SVG já cria espaçamento visual no topo.
+   * O padding real da seção começa após a onda.
+   */
+  padding: `${tokens.spacing.xl} ${tokens.spacing.lg} 80px`,
+  /*
+   * Fundo em camadas — as dunas dos Lençóis Maranhenses:
+   * 1. Halo dourado suave no canto superior direito (sol sobre as dunas)
+   * 2. Sombra azul-noturna no canto inferior esquerdo (transição para o mar)
+   * 3. Gradiente base: branco-areia levemente quente
+   * 4. Pontilhado dourado translúcido — grãos de areia sob a luz
+   */
+  backgroundColor: '#FEFCF8',
+  backgroundImage: [
+    `radial-gradient(ellipse 55% 50% at 92% 8%, rgba(201, 168, 76, 0.10) 0%, transparent 60%)`,
+    `radial-gradient(ellipse 45% 40% at 8% 95%, rgba(13, 31, 60, 0.06) 0%, transparent 55%)`,
+    `linear-gradient(175deg, #FFFFFF 0%, #FEFCF8 50%, #FDF9F2 100%)`,
+    `radial-gradient(circle, rgba(201, 168, 76, 0.12) 1px, transparent 1px)`,
+  ].join(', '),
+  backgroundSize: ['auto', 'auto', 'auto', '28px 28px'].join(', '),
+
+  /*
+   * ESPADAS CRUZADAS — os instrumentos do guerreiro espiritual.
+   * Posicionamento: canto inferior-esquerdo, sangrando para fora:
+   *  • bottom: -12% → as pontas (pomos) mergulham na onda que leva ao CTA
+   *  • left: -8%    → a guarda esquerda some além da borda da tela
+   * Efeito: as espadas parecem cravadas no chão de areia (dunas) abaixo da seção,
+   * como relíquias enterradas nos Lençóis Maranhenses aguardando o Rei.
+   * Cor: azul-marinho (#0D1F3C) sobre o fundo areia — contraste sutil e misterioso.
+   */
+  '::before': {
+    content: '""',
+    position: 'absolute',
+    bottom: '-12%',
+    left: '-8%',
+    width: 'clamp(280px, 38vw, 560px)',
+    height: 'clamp(280px, 38vw, 560px)',
+    backgroundImage: svgEspadasCruzadas(tokens.color.secundaria),
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    opacity: 0.06,
+    pointerEvents: 'none',
+    zIndex: 0,
+  },
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `80px ${tokens.spacing.xl}`,
+      padding: `48px ${tokens.spacing.xl} 96px`,
     },
   },
 });

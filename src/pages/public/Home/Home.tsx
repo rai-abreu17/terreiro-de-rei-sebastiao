@@ -7,9 +7,28 @@ import { FaqSection } from './FaqSection/FaqSection';
 import { ServicesSection } from './ServicesSection/ServicesSection';
 import { TestimonialsSection } from './TestimonialsSection/TestimonialsSection';
 import { OrnatoFlutuante } from '../../../components/ui/OrnatoFlutuante/OrnatoFlutuante';
+import { DivisorOnda } from '../../../components/ui/DivisorOnda/DivisorOnda';
 import { IconBengala, IconGuardaSol } from '../../../assets/icons/SimbolosReiSebastiao';
 import { tokens } from '../../../design-system/tokens.css';
 import { homeContainer } from './Home.css';
+
+/*
+ * Paleta de cores de fundo de cada seção — centralizadas aqui para que as ondas
+ * transicionem com precisão entre as cores adjacentes.
+ * Estes valores espelham os `backgroundColor` definidos nos CSS de cada seção.
+ */
+const COR = {
+  /** Hero: oceano noturno — base do gradiente do HeroSection */
+  oceanoNoturno: '#06101F',
+  /** Serviços: areia dos Lençóis — base quente do ServicesSection */
+  areiaLencois: '#FEFCF8',
+  /** CTA / Depoimentos: vinho carmesim — base do gradiente escarlate */
+  vinhoEscarlate: '#3E0709',
+  /** Sobre: branco puro */
+  brancoRitual: '#FFFFFF',
+  /** Contato: creme suave — neutral[50] */
+  cremeSuave: '#F9F7F5',
+} as const;
 
 export function Home(): React.ReactElement {
   return (
@@ -59,12 +78,67 @@ export function Home(): React.ReactElement {
       />
 
       {/* ─── Seções da Página ───────────────────────────────────────────────── */}
+
       <HeroSection />
+
+      {/*
+       * Onda 1 — Oceano → Dunas:
+       * O mar noturno do Hero recua e deixa exposta a areia quente dos Serviços.
+       * variante "a": onda suave e ampla, como a maré baixando sobre as dunas.
+       */}
+      <DivisorOnda
+        corTopo={COR.oceanoNoturno}
+        corFundo={COR.areiaLencois}
+        variante="a"
+        altura={90}
+      />
+
       <ServicesSection />
+
+      {/*
+       * Onda 2 — Dunas → Câmara do Trono:
+       * A areia dos Lençóis cede espaço ao manto vermelho da Encantaria.
+       * variante "b" invertida: perfil assimétrico de duna, recortado em escarlate.
+       */}
+      <DivisorOnda
+        corTopo={COR.areiaLencois}
+        corFundo={COR.vinhoEscarlate}
+        variante="b"
+        altura={100}
+        invertido
+      />
+
       <ContactCTA />
       <TestimonialsSection />
+
+      {/*
+       * Onda 3 — Manto → Luz:
+       * O carmesim profundo abre-se para o branco ritual da seção Sobre.
+       * variante "c": maré calma chegando à margem — suave, não abrupta.
+       */}
+      <DivisorOnda
+        corTopo={COR.vinhoEscarlate}
+        corFundo={COR.brancoRitual}
+        variante="c"
+        altura={90}
+      />
+
       <AboutSection />
       <FaqSection />
+
+      {/*
+       * Onda 4 — Luz → Areia:
+       * O branco dos rituais desliza para o creme suave da seção de Contato.
+       * variante "d" invertida: ondulação dupla e rítmica — convite para chegar.
+       */}
+      <DivisorOnda
+        corTopo={COR.brancoRitual}
+        corFundo={COR.cremeSuave}
+        variante="d"
+        altura={70}
+        invertido
+      />
+
       <ContactSection />
     </div>
   );

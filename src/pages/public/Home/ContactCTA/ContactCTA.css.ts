@@ -2,22 +2,33 @@ import { style } from '@vanilla-extract/css';
 import { tokens } from '@theme/tokens.css';
 
 export const section = style({
-  backgroundColor: tokens.color.primaria,
-  padding: `80px ${tokens.spacing.xl}`,
   position: 'relative',
   overflow: 'hidden',
+  /*
+   * Gradiente escarlate com canto brilhante — como a câmara do trono iluminada por tochas:
+   * 1. Luz dourada difusa vinda do topo central (como o lustre da sala real)
+   * 2. Escuridão profunda nas bordas — as paredes de pedra do castelo
+   * 3. Gradiente diagonal do vinho ao carmesim quase negro
+   */
+  backgroundColor: tokens.color.primaria,
+  backgroundImage: [
+    `radial-gradient(ellipse 60% 45% at 50% -5%, rgba(201, 168, 76, 0.18) 0%, transparent 65%)`,
+    `radial-gradient(ellipse 80% 70% at 100% 100%, rgba(0, 0, 0, 0.25) 0%, transparent 55%)`,
+    `linear-gradient(148deg, #7D1A1F 0%, ${tokens.color.primaria} 40%, #3E0709 100%)`,
+  ].join(', '),
+  padding: `80px ${tokens.spacing.xl}`,
 
-  /* Ornamento de profundidade — linha dourada superior */
+  /* Ornamento — halo dourado horizontal no topo: a soleira do salão do trono */
   '::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: '50%',
     transform: 'translateX(-50%)',
-    width: '120px',
+    width: '160px',
     height: '2px',
-    backgroundColor: tokens.color.acento.dourado,
-    opacity: 0.6,
+    background: `linear-gradient(90deg, transparent, ${tokens.color.acento.dourado}, transparent)`,
+    opacity: 0.7,
   },
 
   '@media': {

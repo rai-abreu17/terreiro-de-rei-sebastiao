@@ -13,6 +13,7 @@ import {
 import { tokens } from '../../../design-system/tokens.css';
 import { usePublicCatalog } from '../../../hooks/usePublicCatalog';
 import { formatMoney } from '../../../lib/money';
+import { DivisorOnda } from '../../../components/ui/DivisorOnda/DivisorOnda';
 import { FaqSection } from '../Home/FaqSection/FaqSection';
 import {
   type CategoriaPublicaSlug,
@@ -20,6 +21,19 @@ import {
 } from '../ServiceCategoryPage/categoryContent';
 import { getServiceContent } from './serviceContent';
 import * as styles from '../ServiceCategoryPage/ServiceCategoryPage.css';
+
+/*
+ * Cores de fundo — espelham ServiceCategoryPage.css.ts.
+ * Nesta página a ordem é: Hero → section (white) → sectionAlt (cream)
+ * → section (white) → sectionDark (crimson) → FAQ → section.
+ * A onda 2 parte de branco (não creme), diferente da página de categoria.
+ */
+const COR = {
+  heroNavy: '#0D1F3C',
+  branco: '#FFFFFF',
+  cremeSuave: '#F9F7F5',
+  vinho: '#6B1A1A',
+} as const;
 
 function resolverResumoModalidades(modalidades: readonly string[]): string {
   const conjunto = new Set(modalidades);
@@ -146,6 +160,9 @@ export function ServiceDetailPage(): React.ReactElement {
         </div>
       </section>
 
+      {/* Onda 1 — Oceano → Luz */}
+      <DivisorOnda corTopo={COR.heroNavy} corFundo={COR.branco} variante="a" altura={90} />
+
       {/* ── Como é feito ──────────────────────────────────────────────────── */}
       <section id="sobre" className={styles.section}>
         <OrnatoFlutuante
@@ -230,6 +247,9 @@ export function ServiceDetailPage(): React.ReactElement {
         </div>
       </section>
 
+      {/* Onda 2 — Luz → Manto: branco cede ao carmesim dos Depoimentos */}
+      <DivisorOnda corTopo={COR.branco} corFundo={COR.vinho} variante="b" altura={100} invertido />
+
       {/* ── Depoimentos ──────────────────────────────────────────────────── */}
       <section className={styles.sectionDark}>
         <OrnatoFlutuante
@@ -273,6 +293,9 @@ export function ServiceDetailPage(): React.ReactElement {
           </div>
         </div>
       </section>
+
+      {/* Onda 3 — Manto → Ritual: carmesim abre para o branco das perguntas */}
+      <DivisorOnda corTopo={COR.vinho} corFundo={COR.branco} variante="c" altura={90} />
 
       <FaqSection titulo={conteudoServico.faqTitulo} itensFaq={conteudoServico.faqItens} />
 

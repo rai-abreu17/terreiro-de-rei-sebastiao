@@ -5,6 +5,11 @@ export const pageContainer = style({
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: tokens.color.fundo,
+  /*
+   * Impede scroll horizontal causado pelos DivisorOnda que sangram
+   * além da borda direita ou esquerda da viewport.
+   */
+  overflowX: 'hidden',
 });
 
 // ── Hero ──────────────────────────────────────────────────────────────────────

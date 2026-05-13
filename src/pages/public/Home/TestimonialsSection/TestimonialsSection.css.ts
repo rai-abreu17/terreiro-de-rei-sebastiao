@@ -2,9 +2,20 @@ import { style, styleVariants } from '@vanilla-extract/css';
 import { tokens } from '../../../../design-system/tokens.css';
 
 export const container = style({
-  position: 'relative',  /* âncora para ornamentos absolutos */
-  overflow: 'hidden',    /* confina a toalha flutuante */
+  position: 'relative',
+  overflow: 'hidden',
+  /*
+   * Manto aveludado — do vermelho-vinho da Família do Lençol ao carmesim profundo:
+   * 1. Halo dourado difuso no centro superior — a coroa brilhando no manto
+   * 2. Sombra negra nas bordas inferiores — profundidade do tecido
+   * 3. Gradiente diagonal que varia entre os tons do vermelho-vinho
+   */
   backgroundColor: tokens.color.primaria,
+  backgroundImage: [
+    `radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201, 168, 76, 0.14) 0%, transparent 60%)`,
+    `radial-gradient(ellipse 60% 60% at 0% 110%, rgba(0, 0, 0, 0.30) 0%, transparent 55%)`,
+    `linear-gradient(155deg, #7A1518 0%, ${tokens.color.primaria} 35%, #4A0A0F 70%, #320608 100%)`,
+  ].join(', '),
   padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
 
   '@media': {
@@ -70,10 +81,20 @@ export const citacao = style({
       padding: '2.5rem',
     },
   },
-  backgroundColor: `color-mix(in srgb, ${tokens.color.texto.invertido} 8%, ${tokens.color.primaria})`,
-  borderRadius: tokens.radius.lg,
-  border: `1px solid color-mix(in srgb, ${tokens.color.texto.invertido} 14%, transparent)`,
-  borderLeft: `4px solid ${tokens.color.acento.dourado}`,
+
+  /*
+   * Glassmorphism sobre o manto:
+   * — Fundo quase transparente com blur — como um véu sobre o veludo
+   * — Borda dourada fina à esquerda — o friso do manto real
+   * — Borda geral mais sutil — contorno de vidro fosco
+   */
+  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  backdropFilter: 'blur(14px)',
+  WebkitBackdropFilter: 'blur(14px)',
+  borderRadius: '16px',
+  border: `1px solid rgba(201, 168, 76, 0.22)`,
+  borderLeft: `3px solid rgba(201, 168, 76, 0.60)`,
+  boxShadow: `0 4px 24px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.08)`,
   display: 'grid',
   gap: tokens.spacing.lg,
 });

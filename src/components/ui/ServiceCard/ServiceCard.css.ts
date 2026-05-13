@@ -5,33 +5,50 @@ const baseCardContainer = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: tokens.color.fundo,
-  borderRadius: '20px',
+  /*
+   * Glassmorphism etéreo:
+   * — Fundo levemente translúcido, deixando o pontilhado dourado da seção "respirar" por baixo
+   * — Borda dourada fina e suave — o contorno da coroa
+   * — Sombra dupla: externa para profundidade, interna branca para o efeito de vidro facetado
+   */
+  backgroundColor: 'rgba(255, 255, 255, 0.72)',
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
+  borderRadius: '24px',
   padding: tokens.spacing.xl,
-  boxShadow: `0 18px 40px color-mix(in srgb, ${tokens.color.secundaria} 10%, transparent)`,
-  border: `1px solid ${tokens.color.neutral[200]}`,
-  borderTop: `4px solid ${tokens.color.acento.dourado}`,
-  transition: `transform ${tokens.motion.base} ease, box-shadow ${tokens.motion.base} ease`,
+  border: `1px solid rgba(201, 168, 76, 0.28)`,
+  borderTop: `2px solid rgba(201, 168, 76, 0.55)`,
+  boxShadow: [
+    `0 8px 32px rgba(13, 31, 60, 0.07)`,
+    `0 1px 0 rgba(255, 255, 255, 0.90) inset`,
+  ].join(', '),
+  transition: `transform ${tokens.motion.base} ease, box-shadow ${tokens.motion.base} ease, border-color ${tokens.motion.base} ease`,
   height: '100%',
   textAlign: 'center',
   position: 'relative',
   overflow: 'hidden',
 
   selectors: {
+    /* Reflexo superior — como a luz incidindo na faceta superior de um cristal */
     '&::before': {
       content: '""',
       position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
-      height: '120px',
-      background: `linear-gradient(180deg, color-mix(in srgb, ${tokens.color.acento.dourado} 5%, transparent) 0%, transparent 100%)`,
+      height: '80px',
+      background: `linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 100%)`,
+      borderRadius: '24px 24px 0 0',
       pointerEvents: 'none',
     },
     '&:hover, &:focus-within': {
-      transform: 'translateY(-6px)',
-      boxShadow: `0 28px 48px color-mix(in srgb, ${tokens.color.primaria} 14%, transparent)`,
-      borderTopColor: tokens.color.primaria,
+      transform: 'translateY(-8px)',
+      boxShadow: [
+        `0 20px 48px rgba(107, 26, 26, 0.12)`,
+        `0 1px 0 rgba(255, 255, 255, 0.90) inset`,
+      ].join(', '),
+      borderColor: `rgba(201, 168, 76, 0.55)`,
+      borderTopColor: `rgba(201, 168, 76, 0.85)`,
     },
   },
 
@@ -47,8 +64,12 @@ export const cardContainer = baseCardContainer;
 export const cardContainerSelecionado = style([
   baseCardContainer,
   {
-    borderTopColor: tokens.color.primaria,
-    boxShadow: `0 24px 48px color-mix(in srgb, ${tokens.color.primaria} 16%, transparent)`,
+    borderColor: `rgba(107, 26, 26, 0.35)`,
+    borderTopColor: `rgba(107, 26, 26, 0.7)`,
+    boxShadow: [
+      `0 20px 48px rgba(107, 26, 26, 0.14)`,
+      `0 1px 0 rgba(255, 255, 255, 0.90) inset`,
+    ].join(', '),
     transform: 'translateY(-4px)',
   },
 ]);

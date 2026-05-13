@@ -240,6 +240,108 @@ export function IconCruzCristo({ size = 48, color = 'currentColor', 'aria-hidden
   );
 }
 
+/** Coroa Real — insígnia régia do Rei Sebastião, Encantado Gentil */
+export function IconCoroaReal({ size = 48, color = 'currentColor', 'aria-hidden': ariaHidden = true }: IconProps): React.ReactElement {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 300 240"
+      fill="none"
+      stroke={color}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden={ariaHidden}
+    >
+      {/* Corpo da coroa — 3 pontas em W */}
+      <path d="M28,205 L28,128 L0,50 L88,115 L150,12 L212,115 L300,50 L272,128 L272,205 Z"
+        strokeWidth="8" />
+      {/* Faixa de base */}
+      <rect x="18" y="200" width="264" height="34" rx="17" strokeWidth="7" />
+      {/* Gema central — pedra na ponta do meio */}
+      <path d="M150,14 L159,34 L150,44 L141,34 Z" fill={color} stroke="none" />
+      {/* Ornamentos nas pontas laterais */}
+      <circle cx="3" cy="53" r="10" strokeWidth="5" />
+      <circle cx="3" cy="53" r="3" fill={color} stroke="none" />
+      <circle cx="297" cy="53" r="10" strokeWidth="5" />
+      <circle cx="297" cy="53" r="3" fill={color} stroke="none" />
+      {/* Marcações e gemas na faixa */}
+      <line x1="75" y1="200" x2="75" y2="234" strokeWidth="3.5" />
+      <circle cx="112" cy="217" r="6" fill={color} stroke="none" />
+      <line x1="150" y1="200" x2="150" y2="234" strokeWidth="3.5" />
+      <circle cx="188" cy="217" r="6" fill={color} stroke="none" />
+      <line x1="225" y1="200" x2="225" y2="234" strokeWidth="3.5" />
+    </svg>
+  );
+}
+
+/** Espadas Cruzadas — as lâminas do guerreiro militar da Encantaria */
+export function IconEspadasCruzadas({ size = 48, color = 'currentColor', 'aria-hidden': ariaHidden = true }: IconProps): React.ReactElement {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 280 280"
+      fill="none"
+      stroke={color}
+      strokeLinecap="round"
+      aria-hidden={ariaHidden}
+    >
+      {/* Espada 1 — diagonal baixo-esquerda → cima-direita */}
+      <line x1="32" y1="248" x2="248" y2="32" strokeWidth="6" />
+      {/* Guarda espada 1 */}
+      <line x1="58" y1="202" x2="102" y2="158" strokeWidth="11" />
+      {/* Pomo espada 1 */}
+      <circle cx="26" cy="254" r="15" strokeWidth="5.5" />
+      <circle cx="26" cy="254" r="6" fill={color} stroke="none" />
+      {/* Espada 2 — diagonal cima-esquerda → baixo-direita */}
+      <line x1="32" y1="32" x2="248" y2="248" strokeWidth="6" />
+      {/* Guarda espada 2 */}
+      <line x1="178" y1="158" x2="222" y2="202" strokeWidth="11" />
+      {/* Pomo espada 2 */}
+      <circle cx="254" cy="254" r="15" strokeWidth="5.5" />
+      <circle cx="254" cy="254" r="6" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
+/** Touro Negro com Estrela — O Grande Símbolo da lenda dos Lençóis Maranhenses */
+export function IconTouroNegro({ size = 48, color = 'currentColor', 'aria-hidden': ariaHidden = true }: IconProps): React.ReactElement {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 280 275"
+      fill="none"
+      stroke={color}
+      strokeLinecap="round"
+      aria-hidden={ariaHidden}
+    >
+      {/* Chifre esquerdo — em crescente */}
+      <path d="M92,88 C76,64 54,38 28,20 C40,48 58,72 80,92" strokeWidth="7" />
+      {/* Chifre direito */}
+      <path d="M188,88 C204,64 226,38 252,20 C240,48 222,72 200,92" strokeWidth="7" />
+      {/* Cabeça — oval levemente afunilado no queixo */}
+      <path d="M80,92 C63,108 56,140 59,172 C63,208 90,238 140,248 C190,238 217,208 221,172 C224,140 217,108 200,92 C186,78 164,70 140,70 C116,70 94,78 80,92 Z"
+        strokeWidth="7" strokeLinejoin="round" />
+      {/* Estrela de 5 pontas na testa — signo icônico do Touro Encantado */}
+      <path d="M140,94 L148,117 L172,117 L153,131 L160,154 L140,140 L120,154 L127,131 L108,117 L132,117 Z"
+        fill={color} stroke="none" />
+      {/* Olho esquerdo */}
+      <circle cx="100" cy="168" r="12" strokeWidth="5" />
+      <circle cx="100" cy="168" r="4.5" fill={color} stroke="none" />
+      {/* Olho direito */}
+      <circle cx="180" cy="168" r="12" strokeWidth="5" />
+      <circle cx="180" cy="168" r="4.5" fill={color} stroke="none" />
+      {/* Focinho */}
+      <ellipse cx="140" cy="220" rx="33" ry="21" strokeWidth="5" />
+      {/* Narinas */}
+      <ellipse cx="126" cy="222" rx="7.5" ry="6" fill={color} stroke="none" />
+      <ellipse cx="154" cy="222" rx="7.5" ry="6" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
 /** Tambores Sagrados — o Hum, o Humpi e o Lé, regidos pelo Gã de ferro */
 export function IconTambor({ size = 48, color = 'currentColor', 'aria-hidden': ariaHidden = true }: IconProps): React.ReactElement {
   return (

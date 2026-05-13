@@ -1,13 +1,56 @@
 import { style } from '@vanilla-extract/css';
 import { tokens } from '../../../../design-system/tokens.css';
+import { svgCoroaReal } from '../../../../assets/svgs/marcasDaguaSVG';
 
 export const aboutContainer = style({
   position: 'relative',
-  overflow: 'hidden',
+  /*
+   * overflow: visible — necessário para a Coroa Real (::after) sangrar pelo topo
+   * e pela direita. O homeContainer previne scroll horizontal. O sangramento
+   * superior faz a coroa "descer" visivelmente do manto carmesim acima.
+   */
+  overflow: 'visible',
   display: 'flex',
   flexDirection: 'column',
   padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
+  /*
+   * Branco com textura de luz:
+   * 1. Halo dourado vindo da direita — como a luz do entardecer sobre os Lençóis
+   * 2. Suave névoa azul-marinha no canto oposto — a sombra do oceano ao longe
+   * 3. Gradiente base: branco puro a areia-clara
+   */
   backgroundColor: tokens.color.fundo,
+  backgroundImage: [
+    `radial-gradient(ellipse 50% 70% at 105% 50%, rgba(201, 168, 76, 0.09) 0%, transparent 55%)`,
+    `radial-gradient(ellipse 40% 50% at -5% 50%, rgba(13, 31, 60, 0.05) 0%, transparent 55%)`,
+    `linear-gradient(to bottom, #FFFFFF 0%, #FDFAF5 100%)`,
+  ].join(', '),
+
+  /*
+   * COROA REAL — o brasão da Casa e a identidade do Rei Sebastião.
+   * Posicionamento: canto superior-direito, sangrando para fora:
+   *  • top: -8%    → a parte superior da coroa (pontas) emerge de cima,
+   *                   como se viesse do manto carmesim dos Depoimentos acima
+   *  • right: -5%  → a extremidade direita da faixa some além da borda
+   * Efeito: a Coroa "desce" do mundo dos encantados para abençoar a seção
+   * que conta a história da Casa — como a realeza que paira sobre o terreiro.
+   * Cor: vermelho-vinho (#6B1A1A) sobre branco — marca sutil da Família do Lençol.
+   */
+  '::after': {
+    content: '""',
+    position: 'absolute',
+    top: '-8%',
+    right: '-5%',
+    width: 'clamp(300px, 40vw, 580px)',
+    height: 'clamp(300px, 40vw, 580px)',
+    backgroundImage: svgCoroaReal(tokens.color.primaria),
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    opacity: 0.07,
+    pointerEvents: 'none',
+    zIndex: 0,
+  },
 
   '@media': {
     'screen and (min-width: 768px)': {

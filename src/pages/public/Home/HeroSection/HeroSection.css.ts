@@ -9,10 +9,28 @@ export const heroContainer = style({
   alignItems: 'center',
   justifyContent: 'center',
   minHeight: 'calc(100vh - 64px)',
-  padding: `80px ${tokens.spacing.xl} 64px`,
-  backgroundColor: tokens.color.secundaria,
+  padding: `80px ${tokens.spacing.xl} 24px`,
   textAlign: 'center',
-  overflow: 'hidden',
+  /*
+   * overflow: visible — necessário para o Touro Negro (::after) sangrar para além
+   * das bordas inferior e direita. O homeContainer tem overflow-x: hidden,
+   * então não há barra de rolagem horizontal. O sangramento vertical é intencional:
+   * o touro "emerge" do oceano e "mergulha" na onda abaixo.
+   */
+  overflow: 'visible',
+
+  /*
+   * Oceano noturno em camadas:
+   * 1. Fulgor carmesim vindo das profundezas (lower-left) — a terra encantada abaixo das dunas
+   * 2. Halo dourado distante (upper-right) — a coroa do Rei brilhando através da água
+   * 3. Gradiente base: azul-marinho escuro variado em tom, imitando a profundidade do oceano
+   */
+  backgroundColor: tokens.color.secundaria,
+  backgroundImage: [
+    `radial-gradient(ellipse 70% 55% at 10% 110%, ${tokens.color.primaria}3A 0%, transparent 55%)`,
+    `radial-gradient(ellipse 50% 40% at 90% -10%, ${tokens.color.acento.dourado}22 0%, transparent 55%)`,
+    `linear-gradient(168deg, #080F1F 0%, ${tokens.color.secundaria} 35%, #0B1A38 65%, #06101F 100%)`,
+  ].join(', '),
 
   /* Borda dourada no topo — assinatura visual da realeza */
   '::before': {
@@ -27,17 +45,24 @@ export const heroContainer = style({
 
   '@media': {
     'screen and (max-width: 768px)': {
-      padding: `48px ${tokens.spacing.md} 48px`,
+      padding: `48px ${tokens.spacing.md} 24px`,
       minHeight: 'calc(100vh - 64px)',
     },
   },
 });
 
-/* Gradiente radial sutil — profundidade de câmara escura */
+/*
+ * Overlay em duas camadas:
+ * — Halo dourado central suave (como luz filtrada pelas águas rasas das lagoas)
+ * — Véu escuro nas bordas para profundidade de vinheta
+ */
 export const heroOverlay = style({
   position: 'absolute',
   inset: 0,
-  background: `radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201, 168, 76, 0.07) 0%, transparent 70%)`,
+  background: [
+    `radial-gradient(ellipse 65% 55% at 50% 45%, rgba(201, 168, 76, 0.10) 0%, transparent 65%)`,
+    `radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.35) 100%)`,
+  ].join(', '),
   pointerEvents: 'none',
   zIndex: 0,
 });
@@ -79,7 +104,7 @@ export const heroBadge = style({
   },
 });
 
-/* Título principal — Cormorant Garamond em tamanho monumental */
+/* Título principal — Cormorant Garamond em tamanho monumental com halo régio */
 export const heroTitle = style({
   fontFamily: tokens.font.family.titulo,
   fontSize: tokens.font.size.display,
@@ -88,6 +113,8 @@ export const heroTitle = style({
   margin: 0,
   fontWeight: 400,
   letterSpacing: '-0.01em',
+  /* Brilho dourado suave — como o reflexo da coroa nas águas */
+  textShadow: `0 0 60px rgba(201, 168, 76, 0.22), 0 2px 8px rgba(0, 0, 0, 0.5)`,
 });
 
 /* Separador ornamental dourado — linhas + símbolo central */

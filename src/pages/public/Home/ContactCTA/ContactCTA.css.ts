@@ -11,10 +11,14 @@ export const section = style({
    * 3. Gradiente diagonal do vinho ao carmesim quase negro
    */
   backgroundColor: tokens.color.primaria,
+  /*
+   * Removido o linear-gradient direcional: ele escurecia o canto inferior para #3E0709,
+   * criando uma linha visível na junção com TestimonialsSection (que começa mais claro).
+   * Apenas radiais agora — o background base (#6B1A1A) é a cor de junção com Testimonials.
+   */
   backgroundImage: [
     `radial-gradient(ellipse 60% 45% at 50% -5%, rgba(201, 168, 76, 0.18) 0%, transparent 65%)`,
-    `radial-gradient(ellipse 80% 70% at 100% 100%, rgba(0, 0, 0, 0.25) 0%, transparent 55%)`,
-    `linear-gradient(148deg, #7D1A1F 0%, ${tokens.color.primaria} 40%, #3E0709 100%)`,
+    `radial-gradient(ellipse 80% 70% at 100% 100%, rgba(0, 0, 0, 0.20) 0%, transparent 55%)`,
   ].join(', '),
   padding: `80px ${tokens.spacing.xl}`,
 

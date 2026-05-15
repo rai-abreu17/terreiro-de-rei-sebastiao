@@ -4,14 +4,15 @@ export const ondaWrapper = style({
   display: 'block',
   lineHeight: 0,
   overflow: 'hidden',
+  marginBottom: '-3px',
   /*
-   * Margens negativas bilaterais: eliminam a fresta de 1-2px que alguns
-   * browsers renderizam entre blocos em layout flex. O -1px no topo puxa a
-   * onda para dentro da seção acima; o -2px no fundo puxa a seção seguinte
-   * para dentro da onda, garantindo cobertura total sem espaço branco visível.
+   * position: relative transforma o DivisorOnda em elemento posicionado,
+   * fazendo-o entrar no mesmo nível de stacking que as seções adjacentes
+   * (position:relative). Por vir depois no DOM, renderiza por cima da seção
+   * anterior no overlap zone — sem isso, seções com position:relative ficam
+   * na frente e escondem a onda com seu fundo colorido.
    */
-  marginTop: '-1px',
-  marginBottom: '-2px',
+  position: 'relative',
   pointerEvents: 'none',
   userSelect: 'none',
   flexShrink: 0,

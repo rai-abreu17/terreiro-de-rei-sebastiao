@@ -14,7 +14,7 @@ export const container = style({
   backgroundImage: [
     `radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201, 168, 76, 0.14) 0%, transparent 60%)`,
     `radial-gradient(ellipse 60% 60% at 0% 110%, rgba(0, 0, 0, 0.30) 0%, transparent 55%)`,
-    `linear-gradient(155deg, #7A1518 0%, ${tokens.color.primaria} 35%, #4A0A0F 70%, #320608 100%)`,
+    `linear-gradient(155deg, ${tokens.color.primaria} 0%, ${tokens.color.primaria} 35%, #4A0A0F 70%, #320608 100%)`,
   ].join(', '),
   padding: `${tokens.spacing.xl} ${tokens.spacing.lg} 48px`,
 

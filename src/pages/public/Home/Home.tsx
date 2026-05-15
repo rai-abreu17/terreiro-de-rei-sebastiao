@@ -109,8 +109,9 @@ export function Home(): React.ReactElement {
         corTopo={COR.areiaLencois}
         corFundo={COR.vinhoEscarlate}
         variante="b"
-        altura={72}
+        altura={48}
         invertido
+        overlap={4}
       />
 
       <ContactCTA />

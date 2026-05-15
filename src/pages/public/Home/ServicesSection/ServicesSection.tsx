@@ -45,21 +45,21 @@ export function ServicesSection(): React.ReactElement {
     <section id="servicos" className={servicesSectionContainer} aria-labelledby="services-title">
       <OrnatoFlutuante
         Icon={IconBengala}
-        tamanho={280}
+        tamanho={220}
         cor={tokens.color.primaria}
-        opacidade={0.04}
+        opacidade={0.05}
         variante="c"
         atraso="2s"
-        posicao={{ bottom: '-8%', right: '-4%' }}
+        posicao={{ top: '6%', right: '-3%' }}
       />
       <OrnatoFlutuante
         Icon={IconCruzCristo}
-        tamanho={200}
+        tamanho={160}
         cor={tokens.color.secundaria}
         opacidade={0.04}
         variante="a"
         atraso="1s"
-        posicao={{ top: '-5%', left: '-3%' }}
+        posicao={{ top: '40%', left: '-2%' }}
       />
 
       <div className={sectionHeader}>

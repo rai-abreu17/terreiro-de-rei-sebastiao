@@ -11,13 +11,7 @@ export const heroContainer = style({
   minHeight: 'calc(100vh - 64px)',
   padding: `80px ${tokens.spacing.xl} 24px`,
   textAlign: 'center',
-  /*
-   * overflow: visible — necessário para o Touro Negro (::after) sangrar para além
-   * das bordas inferior e direita. O homeContainer tem overflow-x: hidden,
-   * então não há barra de rolagem horizontal. O sangramento vertical é intencional:
-   * o touro "emerge" do oceano e "mergulha" na onda abaixo.
-   */
-  overflow: 'visible',
+  overflow: 'hidden',
 
   /*
    * Oceano noturno em camadas:

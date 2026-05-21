@@ -29,7 +29,7 @@ export function IconInstagram({ size = 24, color = 'currentColor', 'aria-hidden'
 
 /** WhatsApp — ícone oficial: balão com recorte do telefone via SVG mask */
 export function IconWhatsApp({ size = 24, color = 'currentColor', 'aria-hidden': ariaHidden = true }: IconProps): React.ReactElement {
-  const maskId = useId();
+  const maskId = useId().replace(/:/g, '');
   return (
     <svg
       width={size}

@@ -43,6 +43,12 @@ export const heroContainer = style({
       minHeight: 'calc(100vh - 64px)',
     },
   },
+
+  '@supports': {
+    '(height: 100svh)': {
+      minHeight: 'calc(100svh - 64px)',
+    },
+  },
 });
 
 /*

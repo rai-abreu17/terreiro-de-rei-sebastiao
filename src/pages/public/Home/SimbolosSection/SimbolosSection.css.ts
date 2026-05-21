@@ -111,7 +111,7 @@ export const card = style({
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       opacity: 1,
-      translate: '0 0',
+      transform: 'translateY(0)',
       transitionDuration: '0ms',
     },
   },

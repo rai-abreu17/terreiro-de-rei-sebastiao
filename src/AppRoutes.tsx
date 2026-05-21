@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Navigate, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminLayout } from './layouts/AdminLayout/AdminLayout';
 import { RequireAdmin } from './auth/RoleGuard';
@@ -82,6 +82,10 @@ export const rotas = createBrowserRouter([
             element: <DashboardPage />,
           },
           {
+            path: 'catalog',
+            element: <Navigate to="/admin/catalog/services" replace />,
+          },
+          {
             path: 'catalog/services',
             element: <PaginaCatalogoAdmin />,
           },
@@ -98,8 +102,16 @@ export const rotas = createBrowserRouter([
             element: <BookingsDashboardPage />,
           },
           {
+            path: 'availability',
+            element: <Navigate to="/admin/availability/rules" replace />,
+          },
+          {
             path: 'availability/rules',
             element: <DisponibilidadePage />,
+          },
+          {
+            path: '*',
+            element: <Navigate to="/admin" replace />,
           },
         ]
       }

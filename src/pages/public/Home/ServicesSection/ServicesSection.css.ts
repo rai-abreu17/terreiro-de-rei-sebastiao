@@ -7,7 +7,7 @@ export const servicesSectionContainer = style({
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  padding: `${tokens.spacing.sm} ${tokens.spacing.lg} 0`,
+  padding: `calc(64px + ${tokens.spacing.sm}) ${tokens.spacing.lg} 0`,
   /*
    * Fundo em camadas — as dunas dos Lençóis Maranhenses:
    * 1. Halo dourado suave no canto superior direito (sol sobre as dunas)
@@ -55,7 +55,7 @@ export const servicesSectionContainer = style({
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: `${tokens.spacing.md} ${tokens.spacing.xl} 0`,
+      padding: `calc(64px + ${tokens.spacing.md}) ${tokens.spacing.xl} 0`,
     },
   },
 });
@@ -159,12 +159,12 @@ export const messageContainer = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: tokens.spacing.xl,
+  padding: `${tokens.spacing.md} ${tokens.spacing.lg} ${tokens.spacing.lg}`,
   fontFamily: tokens.font.family.corpo,
   fontSize: tokens.font.size.lg,
   color: tokens.color.texto.secundario,
   textAlign: 'center',
-  minHeight: '200px',
+  minHeight: 0,
 });
 
 export const errorText = style({

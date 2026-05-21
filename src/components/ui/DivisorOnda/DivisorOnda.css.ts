@@ -4,13 +4,9 @@ export const ondaWrapper = style({
   display: 'block',
   lineHeight: 0,
   overflow: 'hidden',
-  marginBottom: '-3px',
   /*
-   * position: relative transforma o DivisorOnda em elemento posicionado,
-   * fazendo-o entrar no mesmo nível de stacking que as seções adjacentes
-   * (position:relative). Por vir depois no DOM, renderiza por cima da seção
-   * anterior no overlap zone — sem isso, seções com position:relative ficam
-   * na frente e escondem a onda com seu fundo colorido.
+   * The divider stays in normal document flow. Its explicit height reserves
+   * space between sections, so the SVG does not sit on top of the next section.
    */
   position: 'relative',
   pointerEvents: 'none',

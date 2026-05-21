@@ -24,8 +24,9 @@ interface OrnatoFlutuanteProps {
    * Aplicado via transitionDelay no inline style, garante stagger entre ornamentos.
    */
   readonly atrasoEntrada?: number;
+  readonly reveladoInicial?: boolean;
   /** Posicionamento absoluto dentro da seção ou container pai */
-  readonly posicao: Pick<React.CSSProperties, 'top' | 'left' | 'right' | 'bottom'>;
+  readonly posicao: Pick<React.CSSProperties, 'top' | 'left' | 'right' | 'bottom' | 'zIndex'>;
 }
 
 /**
@@ -57,6 +58,7 @@ export function OrnatoFlutuante({
   variante = 'a',
   atraso = '0s',
   atrasoEntrada = 0,
+  reveladoInicial = false,
   posicao,
 }: OrnatoFlutuanteProps): React.ReactElement {
   const ref = useReveal<HTMLDivElement>();
@@ -70,6 +72,7 @@ export function OrnatoFlutuante({
         transitionDelay: `${atrasoEntrada}s`,
         ...posicao,
       }}
+      data-revealed={reveladoInicial ? 'true' : undefined}
       aria-hidden="true"
       role="presentation"
     >

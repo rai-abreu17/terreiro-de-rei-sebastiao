@@ -10,7 +10,12 @@ import { OrnatoFlutuante } from '../../../components/ui/OrnatoFlutuante/OrnatoFl
 import { DivisorOnda } from '../../../components/ui/DivisorOnda/DivisorOnda';
 import { IconBengala, IconGuardaSol } from '../../../assets/icons/SimbolosReiSebastiao';
 import { tokens } from '../../../design-system/tokens.css';
-import { homeContainer } from './Home.css';
+import {
+  heroServicesDivisorBackground,
+  heroServicesDivisorOverlay,
+  heroServicesOrnamentoAnchor,
+  homeContainer,
+} from './Home.css';
 
 /*
  * Paleta de cores de fundo de cada seção — centralizadas aqui para que as ondas
@@ -54,17 +59,6 @@ export function Home(): React.ReactElement {
        * O cetro patriarcal flutua na margem direita, cruzando a fronteira entre as
        * seções de trabalho espiritual e os depoimentos da comunidade.
        */}
-      <OrnatoFlutuante
-        Icon={IconBengala}
-        tamanho={180}
-        cor={tokens.color.neutral[400]}
-        opacidade={0.07}
-        variante="a"
-        atraso="0s"
-        atrasoEntrada={0}
-        posicao={{ top: '38%', right: '-2%' }}
-      />
-
       {/*
        * Guarda-Sol — entre Depoimentos e Sobre (≈ 58% da altura da página).
        * O grande guarda-sol cerimonial que abre a aparição do Rei atravessa a
@@ -96,7 +90,23 @@ export function Home(): React.ReactElement {
         corFundo={COR.areiaLencois}
         variante="a"
         altura={64}
+        className={`${heroServicesDivisorBackground} ${heroServicesDivisorOverlay}`}
+        transparente
       />
+
+      <div className={heroServicesOrnamentoAnchor} aria-hidden="true">
+        <OrnatoFlutuante
+          Icon={IconBengala}
+          tamanho={280}
+          cor={tokens.color.primaria}
+          opacidade={0.16}
+          variante="a"
+          atraso="0s"
+          atrasoEntrada={0}
+          reveladoInicial
+          posicao={{ top: '-230px', right: 'clamp(-48px, -2vw, -20px)' }}
+        />
+      </div>
 
       <ServicesSection />
 
@@ -111,7 +121,6 @@ export function Home(): React.ReactElement {
         variante="b"
         altura={48}
         invertido
-        overlap={4}
       />
 
       <ContactCTA />

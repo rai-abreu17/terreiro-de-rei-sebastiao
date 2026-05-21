@@ -44,15 +44,6 @@ export function ServicesSection(): React.ReactElement {
   return (
     <section id="servicos" className={servicesSectionContainer} aria-labelledby="services-title">
       <OrnatoFlutuante
-        Icon={IconBengala}
-        tamanho={220}
-        cor={tokens.color.primaria}
-        opacidade={0.05}
-        variante="c"
-        atraso="2s"
-        posicao={{ top: '6%', right: '-3%' }}
-      />
-      <OrnatoFlutuante
         Icon={IconCruzCristo}
         tamanho={160}
         cor={tokens.color.secundaria}

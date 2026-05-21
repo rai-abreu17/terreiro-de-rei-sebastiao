@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import * as styles from './ContactSection.css';
 
 const CONTACT_CARDS = [
@@ -36,9 +37,9 @@ export function ContactSection(): React.ReactElement {
             informados no cadastro atualizados para receber as orientacoes do atendimento.
           </p>
           <div className={styles.actionsRow}>
-            <a href="/agendar" className={styles.primaryAction}>
+            <Link to="/agendar" className={styles.primaryAction}>
               Ir para agendamento
-            </a>
+            </Link>
             <a href="#faq" className={styles.secondaryAction}>
               Ver perguntas frequentes
             </a>

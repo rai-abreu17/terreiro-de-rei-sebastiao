@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { OrnatoFlutuante } from '../../../../components/ui/OrnatoFlutuante/OrnatoFlutuante';
 import {
   IconEspadaVermelha,
@@ -80,9 +81,9 @@ export function HeroSection({
 
         <p className={heroDescription}>{mensagemBoasVindas}</p>
 
-        <a href="/agendar" className={heroCta}>
+        <Link to="/agendar" className={heroCta}>
           Agendar Consulta
-        </a>
+        </Link>
       </div>
     </section>
   );

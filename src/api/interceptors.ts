@@ -4,7 +4,8 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 import { broadcastAuthLogout } from '@/auth/authChannel';
-import { refresh, type ApiRequestConfig, type ProblemDetails } from './auth';
+import { refresh, getMe, type ApiRequestConfig, type ProblemDetails } from './auth';
+import { getCsrfToken } from '@/auth/csrf';
 import { useAuthStore } from '@/store/authStore';
 
 interface RequisicaoComRetry extends InternalAxiosRequestConfig {
@@ -55,6 +56,17 @@ function redirectToLogin(): void {
   }
 }
 
+function shouldRefreshCsrf(error: AxiosError<ProblemDetails>): boolean {
+  const originalRequest = error.config as RequisicaoComRetry | undefined;
+  const problem = extractProblem(error);
+
+  if (!originalRequest || originalRequest._retry) {
+    return false;
+  }
+
+  return error.response?.status === 403 && problem?.code === 'CSRF_TOKEN_MISMATCH';
+}
+
 function shouldRefreshToken(error: AxiosError<ProblemDetails>): boolean {
   const originalRequest = error.config as RequisicaoComRetry | undefined;
   const problem = extractProblem(error);
@@ -92,6 +104,20 @@ export function setupAuthInterceptors(api: AxiosInstance): void {
 
       const axiosError = normalizeTimeoutMessage(error);
       const originalRequest = axiosError.config as RequisicaoComRetry | undefined;
+
+      if (shouldRefreshCsrf(axiosError) && originalRequest) {
+        originalRequest._retry = true;
+        try {
+          await getMe({ __skipAuthRefresh: true } satisfies ApiRequestConfig);
+          const freshToken = getCsrfToken();
+          if (freshToken && originalRequest.headers) {
+            originalRequest.headers['X-CSRF-Token'] = freshToken;
+          }
+          return api(originalRequest);
+        } catch {
+          return Promise.reject(axiosError);
+        }
+      }
 
       if (!shouldRefreshToken(axiosError) || !originalRequest) {
         return Promise.reject(axiosError);

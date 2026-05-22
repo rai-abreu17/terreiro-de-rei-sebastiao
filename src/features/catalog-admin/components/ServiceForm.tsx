@@ -1,8 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import type { Resolver } from 'react-hook-form';
+import type { FieldErrors, FieldPath, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  Eye,
+  FileText,
+  Save,
+  Sparkles,
+} from 'lucide-react';
 import {
   extractCatalogError,
   useCategories,
@@ -57,12 +67,12 @@ const schemaServico = z.object({
   }),
   slug: z
     .string()
-    .min(3, 'Informe um slug com pelo menos 3 caracteres.')
     .max(120, 'O slug deve ter no máximo 120 caracteres.')
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    .refine(
+      (valor) => valor.length === 0 || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(valor),
       'Use apenas letras minúsculas, números e hífens no slug.'
-    ),
+    )
+    .optional(),
   name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.').max(160, 'O nome deve ter no máximo 160 caracteres.'),
   shortDescription: z.string().max(280, 'A descrição curta deve ter no máximo 280 caracteres.').optional().nullable(),
   longDescription: z.string().optional().nullable(),
@@ -75,6 +85,66 @@ const schemaServico = z.object({
 });
 
 type DadosServicoForm = z.infer<typeof schemaServico>;
+type CampoServicoForm = FieldPath<DadosServicoForm>;
+type TipoServicoForm = DadosServicoForm['type'];
+type ModalidadeServicoForm = DadosServicoForm['modalities'][number];
+
+const ROTULOS_TIPO_SERVICO: Record<TipoServicoForm, string> = {
+  CONSULTATION: 'Consulta Oracular',
+  RITUAL: 'Ritual Espiritual',
+};
+
+const ROTULOS_MODALIDADE: Record<ModalidadeServicoForm, string> = {
+  ONLINE: 'Online',
+  IN_PERSON: 'Presencial',
+};
+
+const ETAPAS_SERVICO = [
+  {
+    titulo: 'Identificação',
+    descricao: 'Categoria, tipo e nome do serviço.',
+    campos: ['categoryId', 'type', 'name'],
+  },
+  {
+    titulo: 'Apresentação',
+    descricao: 'Textos que aparecem no catálogo.',
+    campos: ['shortDescription', 'longDescription'],
+  },
+  {
+    titulo: 'Atendimento',
+    descricao: 'Duração, valor e modalidades.',
+    campos: ['durationMin', 'priceInput', 'modalities'],
+  },
+  {
+    titulo: 'Revisão',
+    descricao: 'Conferência antes de salvar.',
+    campos: [],
+  },
+] satisfies ReadonlyArray<{
+  titulo: string;
+  descricao: string;
+  campos: readonly CampoServicoForm[];
+}>;
+
+const INDICE_ULTIMA_ETAPA = ETAPAS_SERVICO.length - 1;
+
+function formatarModalidades(modalidades?: ModalidadeServicoForm[]): string {
+  if (!modalidades?.length) {
+    return 'Nenhuma modalidade selecionada';
+  }
+
+  return modalidades.map((modalidade) => ROTULOS_MODALIDADE[modalidade]).join(' e ');
+}
+
+function encontrarPrimeiraEtapaComErro(
+  erros: FieldErrors<DadosServicoForm>
+): number {
+  const indice = ETAPAS_SERVICO.findIndex((etapa) =>
+    etapa.campos.some((campo) => Boolean(erros[campo]))
+  );
+
+  return indice >= 0 ? indice : 0;
+}
 
 interface ServiceFormProps {
   servicoExistente?: RespostaServico;
@@ -84,6 +154,7 @@ interface ServiceFormProps {
 export function ServiceForm({ servicoExistente, onSuccess }: ServiceFormProps) {
   const navigate = useNavigate();
   const isEdicao = !!servicoExistente;
+  const [etapaAtual, setEtapaAtual] = useState(0);
   const duracoesDisponiveis = Array.from(
     new Set([
       ...DURACOES_PADRAO,
@@ -100,6 +171,7 @@ export function ServiceForm({ servicoExistente, onSuccess }: ServiceFormProps) {
     register,
     handleSubmit,
     setValue,
+    trigger,
     formState: { errors, dirtyFields },
   } = useForm<DadosServicoForm>({
     resolver: zodResolver(schemaServico) as Resolver<DadosServicoForm>,
@@ -117,6 +189,15 @@ export function ServiceForm({ servicoExistente, onSuccess }: ServiceFormProps) {
   });
 
   const nomeAtual = useWatch({ control, name: 'name' });
+  const categoriaAtual = useWatch({ control, name: 'categoryId' });
+  const tipoAtual = useWatch({ control, name: 'type' });
+  const descricaoCurtaAtual = useWatch({ control, name: 'shortDescription' });
+  const descricaoLongaAtual = useWatch({ control, name: 'longDescription' });
+  const duracaoAtual = useWatch({ control, name: 'durationMin' });
+  const precoAtual = useWatch({ control, name: 'priceInput' });
+  const modalidadesAtuais = useWatch({ control, name: 'modalities' });
+  const modalidadesSelecionadas = modalidadesAtuais ?? [];
+  const categoriaSelecionada = categorias?.find((cat) => cat.id === categoriaAtual);
 
   useEffect(() => {
     if (isEdicao && servicoExistente) {
@@ -143,11 +224,51 @@ export function ServiceForm({ servicoExistente, onSuccess }: ServiceFormProps) {
     ? extractCatalogError(erroApi)
     : null;
 
+  const possuiErroNaEtapa = (indiceEtapa: number) =>
+    ETAPAS_SERVICO[indiceEtapa].campos.some((campo) => Boolean(errors[campo]));
+
+  const classeBotaoEtapa = (indiceEtapa: number) => {
+    if (possuiErroNaEtapa(indiceEtapa)) {
+      return estilos.stepButton.erro;
+    }
+
+    if (indiceEtapa === etapaAtual) {
+      return estilos.stepButton.ativa;
+    }
+
+    if (indiceEtapa < etapaAtual) {
+      return estilos.stepButton.concluida;
+    }
+
+    return estilos.stepButton.pendente;
+  };
+
+  const avancarEtapa = async () => {
+    const camposEtapaAtual = ETAPAS_SERVICO[etapaAtual].campos;
+    const etapaValida = camposEtapaAtual.length === 0
+      ? true
+      : await trigger(camposEtapaAtual, { shouldFocus: true });
+
+    if (etapaValida) {
+      setEtapaAtual((indice) => Math.min(indice + 1, INDICE_ULTIMA_ETAPA));
+    }
+  };
+
+  const voltarEtapa = () => {
+    setEtapaAtual((indice) => Math.max(indice - 1, 0));
+  };
+
+  const irParaEtapaAnterior = (indiceEtapa: number) => {
+    if (indiceEtapa <= etapaAtual) {
+      setEtapaAtual(indiceEtapa);
+    }
+  };
+
   const aoSubmeter = (dadosForm: DadosServicoForm) => {
     const payload: RequisicaoCriarServico = {
       categoryId: dadosForm.categoryId,
       type: dadosForm.type,
-      slug: slugificar(dadosForm.slug),
+      slug: slugificar(dadosForm.slug || dadosForm.name),
       name: dadosForm.name,
       shortDescription: dadosForm.shortDescription,
       longDescription: dadosForm.longDescription,
@@ -176,237 +297,421 @@ export function ServiceForm({ servicoExistente, onSuccess }: ServiceFormProps) {
     }
   };
 
+  const aoSubmeterInvalido = (errosFormulario: FieldErrors<DadosServicoForm>) => {
+    setEtapaAtual(encontrarPrimeiraEtapaComErro(errosFormulario));
+  };
+
+  const aoEnviarFormulario = handleSubmit(aoSubmeter, aoSubmeterInvalido);
+
   return (
-    <div className={estilos.container}>
+    <div className={estilos.serviceWizardContainer}>
       {mensagemErroExibida && (
         <div role="alert" aria-live="assertive" className={estilos.painelErro}>
           {mensagemErroExibida}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(aoSubmeter)} noValidate>
-        <fieldset className={estilos.fieldset}>
-          <legend className={estilos.legend}>
-            {isEdicao ? 'Editar Serviço' : 'Novo Serviço'}
-          </legend>
-
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="categoryId" className={estilos.label}>Categoria</label>
-            <select
-              id="categoryId"
-              aria-required="true"
-              aria-describedby={errors.categoryId ? 'erro-categoryId' : undefined}
-              aria-invalid={!!errors.categoryId}
-              className={estilos.select}
-              {...register('categoryId')}
-            >
-              <option value="">Selecione uma categoria...</option>
-              {categorias?.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            {errors.categoryId && (
-              <span id="erro-categoryId" role="alert" className={estilos.errorText}>
-                {errors.categoryId.message}
-              </span>
-            )}
+      <form onSubmit={aoEnviarFormulario} noValidate className={estilos.wizardForm}>
+        <input type="hidden" {...register('slug')} />
+        <aside className={estilos.wizardAside} aria-label="Etapas do cadastro">
+          <div className={estilos.wizardIntro}>
+            <span className={estilos.eyebrow}>Cadastro guiado</span>
+            <h2 className={estilos.wizardTitle}>
+              {isEdicao ? 'Ajustar serviço' : 'Adicionar serviço'}
+            </h2>
+            <p className={estilos.wizardDescription}>
+              Cada etapa guarda uma parte do cadastro para evitar campos soltos demais.
+            </p>
           </div>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="type" className={estilos.label}>Tipo de Serviço</label>
-            <select
-              id="type"
-              aria-required="true"
-              aria-describedby={errors.type ? 'erro-type' : undefined}
-              aria-invalid={!!errors.type}
-              className={estilos.select}
-              {...register('type')}
-            >
-              <option value="CONSULTATION">Consulta Oracular</option>
-              <option value="RITUAL">Ritual Espiritual</option>
-            </select>
-            {errors.type && (
-              <span id="erro-type" role="alert" className={estilos.errorText}>
-                {errors.type.message}
-              </span>
-            )}
-          </div>
+          <ol className={estilos.stepList}>
+            {ETAPAS_SERVICO.map((etapa, indice) => (
+              <li key={etapa.titulo}>
+                <button
+                  type="button"
+                  className={classeBotaoEtapa(indice)}
+                  onClick={() => irParaEtapaAnterior(indice)}
+                  disabled={indice > etapaAtual}
+                  aria-current={indice === etapaAtual ? 'step' : undefined}
+                >
+                  <span className={estilos.stepMarker}>
+                    {indice < etapaAtual && !possuiErroNaEtapa(indice) ? (
+                      <CheckCircle2 size={16} aria-hidden="true" />
+                    ) : (
+                      indice + 1
+                    )}
+                  </span>
+                  <span className={estilos.stepText}>
+                    <strong>{etapa.titulo}</strong>
+                    <small>{etapa.descricao}</small>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="slug" className={estilos.label}>Slug</label>
-            <input
-              id="slug"
-              type="text"
-              autoComplete="off"
-              aria-required="true"
-              aria-describedby={errors.slug ? 'erro-slug' : 'ajuda-slug'}
-              aria-invalid={!!errors.slug}
-              className={estilos.input}
-              {...register('slug', {
-                onBlur: (event) => {
-                  setValue('slug', slugificar(event.target.value), {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
-                },
-              })}
-            />
-            <span id="ajuda-slug" className={estilos.helperText}>
-              Este identificador aparece na URL pública do serviço.
+          <div className={estilos.quickSummary} aria-live="polite">
+            <span className={estilos.summaryEyebrow}>Resumo rápido</span>
+            <strong>{nomeAtual?.trim() || 'Serviço sem nome'}</strong>
+            <span>{categoriaSelecionada?.name ?? 'Categoria pendente'}</span>
+            <span>
+              {duracaoAtual ? `${duracaoAtual} min` : 'Duração pendente'} · {precoAtual || 'Preço pendente'}
             </span>
-            {errors.slug && (
-              <span id="erro-slug" role="alert" className={estilos.errorText}>
-                {errors.slug.message}
-              </span>
-            )}
           </div>
+        </aside>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="name" className={estilos.label}>Nome do serviço</label>
-            <input
-              id="name"
-              type="text"
-              autoComplete="off"
-              aria-required="true"
-              aria-describedby={errors.name ? 'erro-name' : undefined}
-              aria-invalid={!!errors.name}
-              className={estilos.input}
-              {...register('name')}
-            />
-            {errors.name && (
-              <span id="erro-name" role="alert" className={estilos.errorText}>
-                {errors.name.message}
-              </span>
-            )}
-          </div>
+        <div className={estilos.wizardMain}>
+          <header className={estilos.stepHeader}>
+            <span className={estilos.stepCounter}>
+              Etapa {etapaAtual + 1} de {ETAPAS_SERVICO.length}
+            </span>
+            <h3 className={estilos.stepTitle}>{ETAPAS_SERVICO[etapaAtual].titulo}</h3>
+            <p className={estilos.stepDescription}>{ETAPAS_SERVICO[etapaAtual].descricao}</p>
+          </header>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="shortDescription" className={estilos.label}>Descrição curta (opcional)</label>
-            <textarea
-              id="shortDescription"
-              autoComplete="off"
-              aria-describedby={errors.shortDescription ? 'erro-shortDescription' : undefined}
-              aria-invalid={!!errors.shortDescription}
-              className={estilos.textarea}
-              {...register('shortDescription')}
-              style={{ minHeight: '80px' }}
-            />
-            {errors.shortDescription && (
-              <span id="erro-shortDescription" role="alert" className={estilos.errorText}>
-                {errors.shortDescription.message}
-              </span>
-            )}
-          </div>
+          {etapaAtual === 0 && (
+            <fieldset className={estilos.fieldset}>
+              <legend className={estilos.visuallyHidden}>Identificação do serviço</legend>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="longDescription" className={estilos.label}>Descrição completa (opcional, Markdown aceito)</label>
-            <textarea
-              id="longDescription"
-              autoComplete="off"
-              aria-describedby={errors.longDescription ? 'erro-longDescription' : undefined}
-              aria-invalid={!!errors.longDescription}
-              className={estilos.textarea}
-              {...register('longDescription')}
-            />
-            {errors.longDescription && (
-              <span id="erro-longDescription" role="alert" className={estilos.errorText}>
-                {errors.longDescription.message}
-              </span>
-            )}
-          </div>
+              <div className={estilos.fieldGrid}>
+                <div className={estilos.fieldGroup}>
+                  <label htmlFor="categoryId" className={estilos.label}>Categoria</label>
+                  <select
+                    id="categoryId"
+                    aria-required="true"
+                    aria-describedby={errors.categoryId ? 'erro-categoryId' : undefined}
+                    aria-invalid={!!errors.categoryId}
+                    className={estilos.select}
+                    {...register('categoryId')}
+                  >
+                    <option value="">Selecione uma categoria...</option>
+                    {categorias?.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.categoryId && (
+                    <span id="erro-categoryId" role="alert" className={estilos.errorText}>
+                      {errors.categoryId.message}
+                    </span>
+                  )}
+                </div>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="durationMin" className={estilos.label}>Duração (minutos)</label>
-            <select
-              id="durationMin"
-              aria-required="true"
-              aria-describedby={errors.durationMin ? 'erro-durationMin' : undefined}
-              aria-invalid={!!errors.durationMin}
-              className={estilos.select}
-              {...register('durationMin')}
-            >
-              {duracoesDisponiveis.map((duracao) => (
-                <option key={duracao} value={duracao}>
-                  {duracao} minutos
-                </option>
-              ))}
-            </select>
-            {errors.durationMin && (
-              <span id="erro-durationMin" role="alert" className={estilos.errorText}>
-                {errors.durationMin.message}
-              </span>
-            )}
-          </div>
+                <fieldset className={estilos.inlineFieldset}>
+                  <legend className={estilos.label}>Tipo de serviço</legend>
+                  <div className={estilos.optionGrid}>
+                    <label className={estilos.optionLabel}>
+                      <input
+                        className={estilos.optionInput}
+                        type="radio"
+                        value="CONSULTATION"
+                        {...register('type')}
+                      />
+                      <span className={estilos.optionContent}>
+                        <Sparkles size={16} aria-hidden="true" />
+                        Consulta Oracular
+                      </span>
+                    </label>
+                    <label className={estilos.optionLabel}>
+                      <input
+                        className={estilos.optionInput}
+                        type="radio"
+                        value="RITUAL"
+                        {...register('type')}
+                      />
+                      <span className={estilos.optionContent}>
+                        <FileText size={16} aria-hidden="true" />
+                        Ritual Espiritual
+                      </span>
+                    </label>
+                  </div>
+                  {errors.type && (
+                    <span id="erro-type" role="alert" className={estilos.errorText}>
+                      {errors.type.message}
+                    </span>
+                  )}
+                </fieldset>
 
-          <div className={estilos.fieldGroup}>
-            <label htmlFor="priceBrl" className={estilos.label}>Preço (R$)</label>
-            <Controller
-              control={control}
-              name="priceInput"
-              render={({ field }) => (
-                <input
-                  id="priceBrl"
-                  type="text"
-                  inputMode="numeric"
+                <div className={estilos.fieldGroup}>
+                  <label htmlFor="name" className={estilos.label}>Nome do serviço</label>
+                  <input
+                    id="name"
+                    type="text"
+                    autoComplete="off"
+                    aria-required="true"
+                    aria-describedby={errors.name ? 'erro-name' : undefined}
+                    aria-invalid={!!errors.name}
+                    className={estilos.input}
+                    placeholder="Ex.: Jogo de búzios completo"
+                    {...register('name')}
+                  />
+                  {errors.name && (
+                    <span id="erro-name" role="alert" className={estilos.errorText}>
+                      {errors.name.message}
+                    </span>
+                  )}
+                </div>
+
+              </div>
+            </fieldset>
+          )}
+
+          {etapaAtual === 1 && (
+            <fieldset className={estilos.fieldset}>
+              <legend className={estilos.visuallyHidden}>Apresentação no catálogo</legend>
+
+              <div className={estilos.fieldGroupFull}>
+                <label htmlFor="shortDescription" className={estilos.label}>
+                  Descrição curta
+                </label>
+                <textarea
+                  id="shortDescription"
                   autoComplete="off"
-                  aria-required="true"
-                  aria-describedby={errors.priceInput ? 'erro-priceBrl' : undefined}
-                  aria-invalid={!!errors.priceInput}
-                  className={estilos.input}
-                  value={field.value}
-                  onBlur={field.onBlur}
-                  onChange={(event) => {
-                    field.onChange(formatCurrencyInput(event.target.value));
-                  }}
-                  ref={field.ref}
+                  aria-describedby={errors.shortDescription ? 'erro-shortDescription' : 'ajuda-shortDescription'}
+                  aria-invalid={!!errors.shortDescription}
+                  className={estilos.textareaCurta}
+                  placeholder="Uma frase direta para o cartão do catálogo."
+                  {...register('shortDescription')}
                 />
-              )}
-            />
-            {errors.priceInput && (
-              <span id="erro-priceBrl" role="alert" className={estilos.errorText}>
-                {errors.priceInput.message}
-              </span>
-            )}
-          </div>
+                <span id="ajuda-shortDescription" className={estilos.helperText}>
+                  {(descricaoCurtaAtual?.length ?? 0)}/280 caracteres.
+                </span>
+                {errors.shortDescription && (
+                  <span id="erro-shortDescription" role="alert" className={estilos.errorText}>
+                    {errors.shortDescription.message}
+                  </span>
+                )}
+              </div>
 
-          <div className={estilos.fieldGroup}>
-            <span className={estilos.label}>Modalidades disponíveis</span>
-            <div className={estilos.checkboxGroup}>
-              <label className={estilos.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  value="ONLINE"
-                  {...register('modalities')}
+              <div className={estilos.fieldGroupFull}>
+                <label htmlFor="longDescription" className={estilos.label}>
+                  Descrição completa <span className={estilos.optionalLabel}>opcional</span>
+                </label>
+                <textarea
+                  id="longDescription"
+                  autoComplete="off"
+                  aria-describedby={errors.longDescription ? 'erro-longDescription' : 'ajuda-longDescription'}
+                  aria-invalid={!!errors.longDescription}
+                  className={estilos.textareaLonga}
+                  placeholder="Detalhe preparação, condução, duração espiritual e o que a pessoa deve esperar."
+                  {...register('longDescription')}
                 />
-                Online
-              </label>
-              <label className={estilos.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  value="IN_PERSON"
-                  {...register('modalities')}
-                />
-                Presencial
-              </label>
-            </div>
-            {errors.modalities && (
-              <span role="alert" className={estilos.errorText}>
-                {errors.modalities.message}
-              </span>
-            )}
-          </div>
-        </fieldset>
+                <span id="ajuda-longDescription" className={estilos.helperText}>
+                  Pode ficar em branco. Use apenas se precisar detalhar preparação, cuidados ou observações.
+                </span>
+                {errors.longDescription && (
+                  <span id="erro-longDescription" role="alert" className={estilos.errorText}>
+                    {errors.longDescription.message}
+                  </span>
+                )}
+              </div>
+            </fieldset>
+          )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          aria-busy={isPending}
-          className={isPending ? estilos.submitButton.carregando : estilos.submitButton.ativo}
-        >
-          {isPending ? 'Processando...' : 'Salvar serviço'}
-        </button>
+          {etapaAtual === 2 && (
+            <fieldset className={estilos.fieldset}>
+              <legend className={estilos.visuallyHidden}>Atendimento e valor</legend>
+
+              <div className={estilos.fieldGrid}>
+                <div className={estilos.fieldGroup}>
+                  <label htmlFor="durationMin" className={estilos.label}>Duração</label>
+                  <select
+                    id="durationMin"
+                    aria-required="true"
+                    aria-describedby={errors.durationMin ? 'erro-durationMin' : undefined}
+                    aria-invalid={!!errors.durationMin}
+                    className={estilos.select}
+                    {...register('durationMin')}
+                  >
+                    {duracoesDisponiveis.map((duracao) => (
+                      <option key={duracao} value={duracao}>
+                        {duracao} minutos
+                      </option>
+                    ))}
+                  </select>
+                  {errors.durationMin && (
+                    <span id="erro-durationMin" role="alert" className={estilos.errorText}>
+                      {errors.durationMin.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className={estilos.fieldGroup}>
+                  <label htmlFor="priceBrl" className={estilos.label}>Preço</label>
+                  <Controller
+                    control={control}
+                    name="priceInput"
+                    render={({ field }) => (
+                      <input
+                        id="priceBrl"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        aria-required="true"
+                        aria-describedby={errors.priceInput ? 'erro-priceBrl' : undefined}
+                        aria-invalid={!!errors.priceInput}
+                        className={estilos.input}
+                        value={field.value}
+                        onBlur={field.onBlur}
+                        onChange={(event) => {
+                          field.onChange(formatCurrencyInput(event.target.value));
+                        }}
+                        ref={field.ref}
+                      />
+                    )}
+                  />
+                  {errors.priceInput && (
+                    <span id="erro-priceBrl" role="alert" className={estilos.errorText}>
+                      {errors.priceInput.message}
+                    </span>
+                  )}
+                </div>
+
+                <fieldset className={estilos.inlineFieldsetFull}>
+                  <legend className={estilos.label}>Modalidades disponíveis</legend>
+                  <span className={estilos.helperText}>
+                    As opções marcadas aparecem com destaque e selo de selecionado.
+                  </span>
+                  <div className={estilos.optionGrid}>
+                    <label className={estilos.optionLabel}>
+                      <input
+                        className={estilos.optionInput}
+                        type="checkbox"
+                        value="ONLINE"
+                        {...register('modalities')}
+                      />
+                      <span className={estilos.optionContent}>
+                        <span className={estilos.optionTitle}>
+                          <Eye size={16} aria-hidden="true" />
+                          Online
+                        </span>
+                        {modalidadesSelecionadas.includes('ONLINE') && (
+                          <span className={estilos.selectedPill}>
+                            <CheckCircle2 size={14} aria-hidden="true" />
+                            Selecionado
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                    <label className={estilos.optionLabel}>
+                      <input
+                        className={estilos.optionInput}
+                        type="checkbox"
+                        value="IN_PERSON"
+                        {...register('modalities')}
+                      />
+                      <span className={estilos.optionContent}>
+                        <span className={estilos.optionTitle}>
+                          <Clock3 size={16} aria-hidden="true" />
+                          Presencial
+                        </span>
+                        {modalidadesSelecionadas.includes('IN_PERSON') && (
+                          <span className={estilos.selectedPill}>
+                            <CheckCircle2 size={14} aria-hidden="true" />
+                            Selecionado
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  </div>
+                  {errors.modalities && (
+                    <span role="alert" className={estilos.errorText}>
+                      {errors.modalities.message}
+                    </span>
+                  )}
+                </fieldset>
+              </div>
+            </fieldset>
+          )}
+
+          {etapaAtual === 3 && (
+            <section className={estilos.reviewPanel} aria-label="Revisão do serviço">
+              <div className={estilos.reviewHeader}>
+                <CheckCircle2 size={18} aria-hidden="true" />
+                <div>
+                  <h4>Conferir cadastro</h4>
+                  <p>Revise os principais dados antes de salvar no catálogo.</p>
+                </div>
+              </div>
+
+              <dl className={estilos.reviewList}>
+                <div>
+                  <dt>Nome</dt>
+                  <dd>{nomeAtual?.trim() || 'Não informado'}</dd>
+                </div>
+                <div>
+                  <dt>Categoria</dt>
+                  <dd>{categoriaSelecionada?.name ?? 'Não selecionada'}</dd>
+                </div>
+                <div>
+                  <dt>Tipo</dt>
+                  <dd>{ROTULOS_TIPO_SERVICO[tipoAtual]}</dd>
+                </div>
+                <div>
+                  <dt>Duração</dt>
+                  <dd>{duracaoAtual} minutos</dd>
+                </div>
+                <div>
+                  <dt>Preço</dt>
+                  <dd>{precoAtual}</dd>
+                </div>
+                <div>
+                  <dt>Modalidades</dt>
+                  <dd>{formatarModalidades(modalidadesAtuais)}</dd>
+                </div>
+                <div>
+                  <dt>Texto curto</dt>
+                  <dd>{descricaoCurtaAtual?.trim() || 'Sem descrição curta'}</dd>
+                </div>
+                <div>
+                  <dt>Texto completo</dt>
+                  <dd>{descricaoLongaAtual?.trim() ? 'Descrição completa preenchida' : 'Sem descrição completa'}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
+
+          <footer className={estilos.wizardActions}>
+            <button
+              type="button"
+              className={estilos.secondaryButton}
+              onClick={voltarEtapa}
+              disabled={etapaAtual === 0 || isPending}
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              Voltar
+            </button>
+
+            {etapaAtual < INDICE_ULTIMA_ETAPA ? (
+              <button
+                type="button"
+                className={estilos.primaryButton}
+                onClick={() => void avancarEtapa()}
+                disabled={isPending}
+              >
+                Avançar
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={isPending}
+                aria-busy={isPending}
+                className={isPending ? estilos.primaryButtonLoading : estilos.primaryButton}
+              >
+                {isPending ? (
+                  'Processando...'
+                ) : (
+                  <>
+                    <Save size={16} aria-hidden="true" />
+                    Salvar serviço
+                  </>
+                )}
+              </button>
+            )}
+          </footer>
+        </div>
       </form>
     </div>
   );

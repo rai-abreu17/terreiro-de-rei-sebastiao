@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client';
 
 export type Modalidade = 'ONLINE' | 'IN_PERSON';
+export type TipoServicoAgenda = 'CONSULTATION' | 'RITUAL';
 
 export interface AvailabilityRule {
   id: string;
@@ -8,6 +9,7 @@ export interface AvailabilityRule {
   startTime: string;
   endTime: string;
   modalities: Modalidade[];
+  serviceTypes: TipoServicoAgenda[];
   isActive: boolean;
 }
 
@@ -16,6 +18,7 @@ export interface SaveAvailabilityRuleRequest {
   startTime: string;
   endTime: string;
   modalities: Modalidade[];
+  serviceTypes: TipoServicoAgenda[];
   isActive: boolean;
 }
 
@@ -26,6 +29,7 @@ export interface AvailabilityOverride {
   startTime?: string | null;
   endTime?: string | null;
   modalities?: Modalidade[] | null;
+  serviceTypes?: TipoServicoAgenda[] | null;
   reason?: string | null;
 }
 
@@ -35,6 +39,7 @@ export interface SaveAvailabilityOverrideRequest {
   startTime?: string | null;
   endTime?: string | null;
   modalities?: Modalidade[] | null;
+  serviceTypes?: TipoServicoAgenda[] | null;
   reason?: string | null;
 }
 

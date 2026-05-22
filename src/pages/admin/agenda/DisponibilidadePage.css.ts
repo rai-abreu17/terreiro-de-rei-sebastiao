@@ -523,6 +523,8 @@ export const dayWindows = style({
 export const windowPill = style({
   display: 'inline-flex',
   maxWidth: '100%',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
   padding: `2px ${tokens.spacing.xs}`,
   borderRadius: '999px',
   backgroundColor: `color-mix(in srgb, ${tokens.color.primaria} 10%, ${tokens.color.fundo})`,

@@ -2,9 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios, { type AxiosError } from 'axios';
 import type { ProblemDetails } from '@/api/catalog.types';
 import {
+  batchCreateAvailabilityOverrides,
   createAvailabilityOverride,
   createAvailabilityRule,
   deleteAvailabilityOverride,
+  deleteAvailabilityOverridesByDate,
   deleteAvailabilityRule,
   listAvailabilityOverrides,
   listAvailabilityRules,
@@ -126,6 +128,24 @@ export function useAvailability(options: UseAvailabilityOptions = {}) {
     onSuccess: invalidateAvailability,
   });
 
+  const deleteOverridesByDateMutation = useMutation<
+    void,
+    AxiosError<ProblemDetails>,
+    string
+  >({
+    mutationFn: deleteAvailabilityOverridesByDate,
+    onSuccess: invalidateAvailability,
+  });
+
+  const batchCreateOverridesMutation = useMutation<
+    AvailabilityOverride[],
+    AxiosError<ProblemDetails>,
+    SaveAvailabilityOverrideRequest[]
+  >({
+    mutationFn: batchCreateAvailabilityOverrides,
+    onSuccess: invalidateAvailability,
+  });
+
   return {
     rules: rulesQuery.data ?? [],
     overrides: overridesQuery.data ?? [],
@@ -137,5 +157,7 @@ export function useAvailability(options: UseAvailabilityOptions = {}) {
     createOverrideMutation,
     updateOverrideMutation,
     deleteOverrideMutation,
+    deleteOverridesByDateMutation,
+    batchCreateOverridesMutation,
   };
 }

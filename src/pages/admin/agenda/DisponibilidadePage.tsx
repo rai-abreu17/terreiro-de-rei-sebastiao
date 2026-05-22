@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import * as styles from './DisponibilidadePage.css';
+import { useAvailability, extractAvailabilityError } from '@/hooks/useAvailability';
+import type { SaveAvailabilityOverrideRequest, AvailabilityOverride } from '@/api/availability-admin';
 
 type Modalidade = 'IN_PERSON' | 'ONLINE';
 type TipoDia = 'atendimento' | 'fechado';
-type CategoriaServico = 'CONSULTAS' | 'RITUAIS';
+type CategoriaServico = 'CONSULTATION' | 'RITUAL';
 
 type JanelaHorario = {
   id: string;
@@ -47,8 +49,8 @@ const MODALIDADES: Array<{ valor: Modalidade; rotulo: string; icone: string }> =
 ];
 
 const CATEGORIAS_SERVICO: Array<{ valor: CategoriaServico; rotulo: string; sigla: string }> = [
-  { valor: 'CONSULTAS', rotulo: 'Consultas', sigla: 'C' },
-  { valor: 'RITUAIS', rotulo: 'Rituais', sigla: 'R' },
+  { valor: 'CONSULTATION', rotulo: 'Consultas', sigla: 'C' },
+  { valor: 'RITUAL', rotulo: 'Rituais', sigla: 'R' },
 ];
 
 const MES_INICIAL = new Date(2026, 4, 1);
@@ -58,7 +60,7 @@ const SEMANA_PADRAO_INICIAL: SemanaPadrao = {
   inicio: '09:00',
   termino: '17:00',
   modalidades: ['ONLINE'],
-  categorias: ['CONSULTAS', 'RITUAIS'],
+  categorias: ['CONSULTATION', 'RITUAL'],
   preservarConfigurados: true,
 };
 
@@ -168,7 +170,7 @@ function criarJanela(
   inicio: string,
   termino: string,
   modalidades: Modalidade[],
-  categorias: CategoriaServico[] = ['CONSULTAS', 'RITUAIS']
+  categorias: CategoriaServico[] = ['CONSULTATION', 'RITUAL']
 ): JanelaHorario {
   return { id, inicio, termino, modalidades, categorias };
 }
@@ -383,7 +385,6 @@ function renderizarConteudoDiaMobile(configuracao?: ConfiguracaoDia): React.Reac
 
 export function DisponibilidadePage(): React.ReactElement {
   const [mesAtual, setMesAtual] = useState(MES_INICIAL);
-  const [configuracoes, setConfiguracoes] = useState<Record<string, ConfiguracaoDia>>(() => criarConfiguracoesExemplo());
   const [dataSelecionada, setDataSelecionada] = useState<string | null>(null);
   const [rascunho, setRascunho] = useState<ConfiguracaoDia | null>(null);
   const [novaJanela, setNovaJanela] = useState<NovaJanela | null>(null);
@@ -392,6 +393,64 @@ export function DisponibilidadePage(): React.ReactElement {
   const [modalSemanaAberto, setModalSemanaAberto] = useState(false);
   const [semanaPadrao, setSemanaPadrao] = useState<SemanaPadrao>(SEMANA_PADRAO_INICIAL);
   const [painelMobileAberto, setPainelMobileAberto] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+
+  const mesFiltroFrom = useMemo(() => {
+    const ano = mesAtual.getFullYear();
+    const mes = mesAtual.getMonth();
+    return `${ano}-${doisDigitos(mes + 1)}-01`;
+  }, [mesAtual]);
+
+  const mesFiltroTo = useMemo(() => {
+    const fim = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 0);
+    return chaveDaData(fim);
+  }, [mesAtual]);
+
+  const {
+    overrides,
+    overridesQuery,
+    createOverrideMutation,
+    deleteOverridesByDateMutation,
+    batchCreateOverridesMutation,
+  } = useAvailability({
+    overrides: { from: mesFiltroFrom, to: mesFiltroTo },
+  });
+
+  const configuracoes = useMemo(() => {
+    const mapa: Record<string, ConfiguracaoDia> = {};
+
+    for (const override of overrides) {
+      const chave = override.date;
+      const existente = mapa[chave];
+
+      if (override.isClosed) {
+        mapa[chave] = criarConfiguracaoFechado(override.reason ?? '');
+        continue;
+      }
+
+      const janela = criarJanela(
+        override.id,
+        override.startTime ?? '09:00',
+        override.endTime ?? '17:00',
+        (override.modalities ?? []) as Modalidade[],
+        (override.serviceTypes ?? []) as CategoriaServico[]
+      );
+
+      if (existente && existente.tipo === 'atendimento') {
+        existente.janelas.push(janela);
+        if (override.notes && !existente.observacao) {
+          existente.observacao = override.notes;
+        }
+      } else {
+        const config = criarConfiguracaoAtendimento([janela], override.notes ?? '');
+        mapa[chave] = config;
+      }
+    }
+
+    return mapa;
+  }, [overrides]);
+
+  const carregando = overridesQuery.isLoading;
 
   const hoje = useMemo(() => inicioDoDia(new Date()), []);
   const diasDoMes = useMemo(() => obterDiasDoMes(mesAtual), [mesAtual]);
@@ -403,7 +462,7 @@ export function DisponibilidadePage(): React.ReactElement {
   );
   const janelasParaValidacao = rascunho?.janelas.filter((janela) => janela.id !== janelaEmEdicaoId) ?? [];
   const erroNovaJanela = novaJanela ? validarNovaJanela(novaJanela, janelasParaValidacao) : null;
-  const podeSalvarDia = Boolean(rascunho && (rascunho.tipo === 'fechado' || rascunho.janelas.length > 0));
+  const podeSalvarDia = Boolean(rascunho && !salvando && (rascunho.tipo === 'fechado' || rascunho.janelas.length > 0));
   const semanaPadraoInvalida =
     semanaPadrao.termino <= semanaPadrao.inicio ||
     semanaPadrao.modalidades.length === 0 ||
@@ -628,62 +687,103 @@ export function DisponibilidadePage(): React.ReactElement {
     });
   };
 
-  const limparDia = () => {
-    if (!dataSelecionada || !dataSelecionadaObjeto) {
+  const limparDia = async () => {
+    if (!dataSelecionada || !dataSelecionadaObjeto || salvando) {
       return;
     }
 
-    setConfiguracoes((estadoAtual) => {
-      const proximasConfiguracoes = { ...estadoAtual };
-      delete proximasConfiguracoes[dataSelecionada];
-      return proximasConfiguracoes;
-    });
-    setRascunho(criarRascunhoPadrao(dataSelecionadaObjeto));
-    setNovaJanela(null);
-    setJanelaEmEdicaoId(null);
-    setToast(`✓ ${formatarDataToast(dataSelecionadaObjeto)} limpa.`);
+    setSalvando(true);
+    try {
+      await deleteOverridesByDateMutation.mutateAsync(dataSelecionada);
+      setRascunho(criarRascunhoPadrao(dataSelecionadaObjeto));
+      setNovaJanela(null);
+      setJanelaEmEdicaoId(null);
+      setToast(`✓ ${formatarDataToast(dataSelecionadaObjeto)} limpa.`);
+    } catch (erro) {
+      setToast(`✗ ${extractAvailabilityError(erro)}`);
+    } finally {
+      setSalvando(false);
+    }
   };
 
-  const salvarDia = () => {
+  const salvarDia = async () => {
     if (!dataSelecionada || !rascunho || !dataSelecionadaObjeto || !podeSalvarDia) {
       return;
     }
 
-    const configuracaoParaSalvar = prepararConfiguracaoParaSalvar(rascunho);
-
-    setConfiguracoes((estadoAtual) => {
-      const proximasConfiguracoes = {
-        ...estadoAtual,
-        [dataSelecionada]: configuracaoParaSalvar,
-      };
+    setSalvando(true);
+    try {
+      const configuracaoFinal = prepararConfiguracaoParaSalvar(rascunho);
+      const datasParaSalvar = [dataSelecionada];
 
       if (rascunho.tipo === 'atendimento' && rascunho.repetirAtivo) {
         ocorrenciasRepeticao.forEach((data) => {
-          proximasConfiguracoes[chaveDaData(data)] = prepararConfiguracaoParaSalvar(rascunho);
+          datasParaSalvar.push(chaveDaData(data));
         });
       }
 
-      return proximasConfiguracoes;
-    });
-    setRascunho({
-      ...clonarConfiguracao(configuracaoParaSalvar),
-      repetirAtivo: rascunho.repetirAtivo,
-      aplicarAte: rascunho.aplicarAte,
-    });
-    setToast(`✓ ${formatarDataToast(dataSelecionadaObjeto)} configurada.`);
+      const payloads: SaveAvailabilityOverrideRequest[] = [];
+      
+      for (const chaveData of datasParaSalvar) {
+        if (configuracaoFinal.tipo === 'fechado') {
+          payloads.push({
+            date: chaveData,
+            isClosed: true,
+            startTime: null,
+            endTime: null,
+            modalities: null,
+            serviceTypes: null,
+            reason: configuracaoFinal.motivo.trim() || null,
+            notes: null,
+          });
+        } else {
+          configuracaoFinal.janelas.forEach((janela, indice) => {
+            payloads.push({
+              date: chaveData,
+              isClosed: false,
+              startTime: janela.inicio,
+              endTime: janela.termino,
+              modalities: janela.modalidades,
+              serviceTypes: janela.categorias,
+              reason: null,
+              notes: indice === 0 ? (configuracaoFinal.observacao.trim() || null) : null,
+            });
+          });
+        }
+      }
+
+      for (const chaveData of datasParaSalvar) {
+        await deleteOverridesByDateMutation.mutateAsync(chaveData);
+      }
+
+      await batchCreateOverridesMutation.mutateAsync(payloads);
+
+      setRascunho({
+        ...clonarConfiguracao(configuracaoFinal),
+        repetirAtivo: rascunho.repetirAtivo,
+        aplicarAte: rascunho.aplicarAte,
+      });
+      setToast(`✓ ${formatarDataToast(dataSelecionadaObjeto)} configurada.`);
+    } catch (erro) {
+      setToast(`✗ ${extractAvailabilityError(erro)}`);
+    } finally {
+      setSalvando(false);
+    }
   };
 
-  const aplicarSemanaPadrao = () => {
-    if (semanaPadraoInvalida) {
+  const aplicarSemanaPadrao = async () => {
+    if (semanaPadraoInvalida || salvando) {
       return;
     }
 
-    const ano = mesAtual.getFullYear();
-    const mes = mesAtual.getMonth();
-    const totalDias = new Date(ano, mes + 1, 0).getDate();
+    setSalvando(true);
+    try {
+      const ano = mesAtual.getFullYear();
+      const mes = mesAtual.getMonth();
+      const totalDias = new Date(ano, mes + 1, 0).getDate();
 
-    setConfiguracoes((estadoAtual) => {
-      const proximasConfiguracoes = { ...estadoAtual };
+      const payloads: SaveAvailabilityOverrideRequest[] = [];
+      const datasParaDeletar: string[] = [];
 
       for (let dia = 1; dia <= totalDias; dia += 1) {
         const data = new Date(ano, mes, dia);
@@ -693,25 +793,38 @@ export function DisponibilidadePage(): React.ReactElement {
           continue;
         }
 
-        if (semanaPadrao.preservarConfigurados && proximasConfiguracoes[chave]) {
+        if (semanaPadrao.preservarConfigurados && configuracoes[chave]) {
           continue;
         }
 
-        proximasConfiguracoes[chave] = criarConfiguracaoAtendimento([
-          criarJanela(
-            `semana-${chave}`,
-            semanaPadrao.inicio,
-            semanaPadrao.termino,
-            [...semanaPadrao.modalidades],
-            [...semanaPadrao.categorias]
-          ),
-        ]);
+        datasParaDeletar.push(chave);
+        payloads.push({
+          date: chave,
+          isClosed: false,
+          startTime: semanaPadrao.inicio,
+          endTime: semanaPadrao.termino,
+          modalities: semanaPadrao.modalidades,
+          serviceTypes: semanaPadrao.categorias,
+          reason: null,
+          notes: null,
+        });
       }
 
-      return proximasConfiguracoes;
-    });
-    setModalSemanaAberto(false);
-    setToast(`✓ Semana padrão aplicada a ${formatarMesAno(mesAtual)}.`);
+      for (const chaveData of datasParaDeletar) {
+        await deleteOverridesByDateMutation.mutateAsync(chaveData);
+      }
+      
+      if (payloads.length > 0) {
+        await batchCreateOverridesMutation.mutateAsync(payloads);
+      }
+
+      setModalSemanaAberto(false);
+      setToast(`✓ Semana padrão aplicada a ${formatarMesAno(mesAtual)}.`);
+    } catch (erro) {
+      setToast(`✗ ${extractAvailabilityError(erro)}`);
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const renderizarConteudoDia = (configuracao?: ConfiguracaoDia) => {

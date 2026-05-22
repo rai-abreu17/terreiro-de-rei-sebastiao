@@ -31,6 +31,7 @@ export interface AvailabilityOverride {
   modalities?: Modalidade[] | null;
   serviceTypes?: TipoServicoAgenda[] | null;
   reason?: string | null;
+  notes?: string | null;
 }
 
 export interface SaveAvailabilityOverrideRequest {
@@ -41,6 +42,7 @@ export interface SaveAvailabilityOverrideRequest {
   modalities?: Modalidade[] | null;
   serviceTypes?: TipoServicoAgenda[] | null;
   reason?: string | null;
+  notes?: string | null;
 }
 
 export interface ListAvailabilityOverridesParams {
@@ -120,4 +122,21 @@ export async function deleteAvailabilityOverride(
   overrideId: string
 ): Promise<void> {
   await apiClient.delete(`/admin/availability/overrides/${overrideId}`);
+}
+
+export async function deleteAvailabilityOverridesByDate(
+  date: string
+): Promise<void> {
+  await apiClient.delete(`/admin/availability/overrides/by-date/${date}`);
+}
+
+export async function batchCreateAvailabilityOverrides(
+  payloads: SaveAvailabilityOverrideRequest[]
+): Promise<AvailabilityOverride[]> {
+  const { data } = await apiClient.post<AvailabilityOverride[]>(
+    '/admin/availability/overrides/batch',
+    payloads
+  );
+
+  return data;
 }

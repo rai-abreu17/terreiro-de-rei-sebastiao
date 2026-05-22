@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getCsrfToken } from '@/auth/csrf';
+import { obterAccessToken } from '@/auth/tokenStorage';
 import { setupAuthInterceptors } from './interceptors';
 
 /**
@@ -32,6 +33,11 @@ apiClient.interceptors.request.use(
   (config) => {
     const metodo = config.method?.toLowerCase();
     const csrfToken = getCsrfToken();
+    const accessToken = obterAccessToken();
+
+    if (accessToken && config.headers && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
 
     if (
       csrfToken &&
@@ -49,4 +55,3 @@ apiClient.interceptors.request.use(
 
 
 setupAuthInterceptors(apiClient);
-

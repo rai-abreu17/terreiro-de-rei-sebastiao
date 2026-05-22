@@ -1,5 +1,6 @@
-import type { AxiosRequestConfig, AxiosError } from 'axios';
+import type { AxiosRequestConfig, AxiosError, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
 import { apiClient } from './client';
+import { limparAccessToken, registrarAccessToken } from '@/auth/tokenStorage';
 
 export interface AuthFieldError {
   readonly field: string;
@@ -37,17 +38,39 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
   __skipAuthRefresh?: boolean;
 }
 
+function registrarTokenDaResposta(
+  headers: AxiosResponseHeaders | RawAxiosResponseHeaders
+): void {
+  const authorization = headers?.authorization;
+  const valorHeader = Array.isArray(authorization) ? authorization[0] : authorization;
+
+  if (typeof valorHeader !== 'string') {
+    return;
+  }
+
+  const [, token] = valorHeader.match(/^Bearer\s+(.+)$/i) ?? [];
+  if (token) {
+    registrarAccessToken(token);
+  }
+}
+
 export function login(
   credentials: LoginDTO,
   config?: ApiRequestConfig
 ): Promise<AuthEnvelope> {
   return apiClient
     .post<AuthEnvelope>('/auth/login', credentials, config)
-    .then((response) => response.data);
+    .then((response) => {
+      registrarTokenDaResposta(response.headers);
+      return response.data;
+    });
 }
 
 export function logout(config?: ApiRequestConfig): Promise<void> {
-  return apiClient.post('/auth/logout', undefined, config).then(() => undefined);
+  return apiClient
+    .post('/auth/logout', undefined, config)
+    .finally(limparAccessToken)
+    .then(() => undefined);
 }
 
 export function getMe(config?: ApiRequestConfig): Promise<AuthEnvelope> {
@@ -57,7 +80,10 @@ export function getMe(config?: ApiRequestConfig): Promise<AuthEnvelope> {
 export function refresh(config?: ApiRequestConfig): Promise<AuthEnvelope> {
   return apiClient
     .post<AuthEnvelope>('/auth/refresh', undefined, config)
-    .then((response) => response.data);
+    .then((response) => {
+      registrarTokenDaResposta(response.headers);
+      return response.data;
+    });
 }
 
 export function isProblemDetailsError(

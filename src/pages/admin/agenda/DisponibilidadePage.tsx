@@ -349,8 +349,10 @@ function IconeCalendario(): React.ReactElement {
 }
 
 function formatarHoraComprimida(hora: string): string {
-  const [h, m] = hora.split(':');
-  return m === '00' ? h : hora;
+  const partes = hora.split(':');
+  const h = parseInt(partes[0], 10);
+  const m = parseInt(partes[1] ?? '0', 10);
+  return m === 0 ? `${h}h` : `${h}h${m}min`;
 }
 
 function renderizarConteudoDiaMobile(configuracao?: ConfiguracaoDia): React.ReactElement {
@@ -368,7 +370,7 @@ function renderizarConteudoDiaMobile(configuracao?: ConfiguracaoDia): React.Reac
 
   if (configuracao.janelas.length === 1) {
     const j = configuracao.janelas[0];
-    const horario = `${formatarHoraComprimida(j.inicio)}–${formatarHoraComprimida(j.termino)}h`;
+    const horario = `${formatarHoraComprimida(j.inicio)}–${formatarHoraComprimida(j.termino)}`;
     const icones = MODALIDADES.filter((m) => j.modalidades.includes(m.valor))
       .map((m) => m.icone)
       .join('');
@@ -846,7 +848,7 @@ export function DisponibilidadePage(): React.ReactElement {
         <div className={styles.dayWindows}>
           {janelasVisiveis.map((janela) => (
             <span key={janela.id} className={styles.windowPill}>
-              {janela.inicio}–{janela.termino}
+              {formatarHoraComprimida(janela.inicio)}–{formatarHoraComprimida(janela.termino)}
             </span>
           ))}
           {janelasRestantes > 0 && <span className={styles.morePill}>+{janelasRestantes} mais</span>}

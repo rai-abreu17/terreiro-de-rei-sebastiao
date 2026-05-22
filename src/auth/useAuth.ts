@@ -10,6 +10,9 @@ export function useAuth() {
   const encerrarSessao = useCallback(async () => {
     try {
       await logout({ __skipAuthRefresh: true });
+    } catch {
+      // Falha no backend (ex: sessão já expirada) é ignorada intencionalmente.
+      // O estado local é sempre limpo no bloco finally.
     } finally {
       limparSessao();
       broadcastAuthLogout();

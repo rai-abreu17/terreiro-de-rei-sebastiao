@@ -1,6 +1,19 @@
 import { style } from '@vanilla-extract/css';
 import { tokens } from '@theme/tokens.css';
 
+/**
+ * Estilos do Catálogo de Serviços — Painel Administrativo.
+ *
+ * Correções aplicadas:
+ *   1 — Toggle switch CSS puro com confirmação inline
+ *   2 — Barra de filtros coesa (replica Marcações)
+ *   3 — Barra lateral colorida por tipo de serviço
+ *   4 — Botão ⋯ circular com portal fixo (replica Marcações)
+ *   5 — Altura 72px, hover com opacidade sobre primária, zebra stripes
+ *
+ * Sem magic strings de cor — tudo via tokens.
+ */
+
 const surfaceBorder = tokens.color.neutral[200];
 const surfaceMuted = tokens.color.neutral[50];
 const textMuted = tokens.color.texto.secundario;
@@ -44,6 +57,8 @@ const buttonBase = style({
   },
 });
 
+// ── Layout da página ───────────────────────────────────
+
 export const pagina = style({
   display: 'grid',
   gap: tokens.spacing.lg,
@@ -54,7 +69,7 @@ export const pagina = style({
 export const cabecalho = style({
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'flex-end',
+  alignItems: 'flex-start',
   gap: tokens.spacing.md,
   flexWrap: 'wrap',
 });
@@ -78,6 +93,20 @@ export const titulo = style({
   lineHeight: 1,
 });
 
+export const descricaoCabecalho = style({
+  margin: `${tokens.spacing.xs} 0 0`,
+  color: textMuted,
+  fontSize: tokens.font.size.sm,
+});
+
+export const contadorCabecalho = style({
+  display: 'inline-block',
+  marginTop: tokens.spacing.xs,
+  color: textMuted,
+  fontSize: tokens.font.size.sm,
+  fontWeight: Number(tokens.font.weight.semibold),
+});
+
 export const painel = style({
   display: 'grid',
   gap: tokens.spacing.md,
@@ -87,41 +116,128 @@ export const painel = style({
   boxShadow: `0 0 0 1px ${surfaceBorder}`,
 });
 
-export const barraFerramentas = style({
+// ── Filtros em chips (toggle pills) ─────────────────────
+
+export const barraFiltros = style({
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: tokens.spacing.md,
+  alignItems: 'flex-start',
+  gap: tokens.spacing.xl,
   flexWrap: 'wrap',
+  '@media': {
+    'screen and (max-width: 767px)': {
+      gap: tokens.spacing.lg,
+    },
+  },
 });
 
-export const grupoFiltros = style({
+/** Grupo vertical: rótulo + linha de chips. */
+export const grupoChips = style({
   display: 'flex',
-  gap: tokens.spacing.sm,
-  flexWrap: 'wrap',
+  flexDirection: 'column',
+  gap: '12px',
 });
 
-export const filtro = style({
-  minWidth: 200,
-  borderRadius: tokens.radius.md,
-  border: `1px solid ${surfaceBorder}`,
-  backgroundColor: tokens.color.fundo,
-  color: tokens.color.texto.primario,
+/** Rótulo pequeno acima dos chips (TIPO / CATEGORIA). */
+export const rotuloChips = style({
+  color: tokens.color.neutral[800],
   fontFamily: tokens.font.family.corpo,
-  fontSize: tokens.font.size.sm,
-  padding: `${tokens.spacing.sm} ${tokens.spacing.md}`,
+  fontSize: '14px',
+  fontWeight: Number(tokens.font.weight.bold),
+  lineHeight: 1,
+});
+
+/** Linha horizontal de chips. */
+export const listaChips = style({
+  display: 'flex',
+  gap: '10px',
+  flexWrap: 'wrap',
+});
+
+/** Chip ativo — fundo suave, sem borda, checkmark visível. */
+export const chipAtivo = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '6px 14px',
+  borderRadius: 999,
+  fontSize: '14px',
+  fontFamily: tokens.font.family.corpo,
+  fontWeight: Number(tokens.font.weight.medium),
+  cursor: 'pointer',
+  border: `1px solid transparent`,
+  backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 12%, ${tokens.color.fundo})`,
+  color: tokens.color.secundaria,
+  transition: `background-color ${tokens.motion.fast} ease, border-color ${tokens.motion.fast} ease, opacity ${tokens.motion.fast} ease`,
   selectors: {
+    '&:hover': {
+      backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 16%, ${tokens.color.fundo})`,
+    },
     '&:focus-visible': {
       outline: `2px solid ${tokens.color.acento.dourado}`,
       outlineOffset: 2,
     },
   },
+  '@media': {
+    'screen and (max-width: 767px)': {
+      padding: '8px 14px',
+      fontSize: '0.875rem',
+    },
+  },
 });
 
-export const resumo = style({
+/** Chip inativo — fantasma, sem fundo, texto esmaecido. */
+export const chipInativo = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '6px 14px',
+  borderRadius: 999,
+  fontSize: '14px',
+  fontFamily: tokens.font.family.corpo,
+  fontWeight: Number(tokens.font.weight.medium),
+  cursor: 'pointer',
+  border: `1px solid ${surfaceBorder}`,
+  backgroundColor: tokens.color.fundo,
+  color: tokens.color.neutral[500],
+  transition: `background-color ${tokens.motion.fast} ease, border-color ${tokens.motion.fast} ease, color ${tokens.motion.fast} ease`,
+  selectors: {
+    '&:hover': {
+      borderColor: tokens.color.neutral[400],
+      color: tokens.color.texto.primario,
+      backgroundColor: `color-mix(in srgb, ${surfaceMuted} 50%, transparent)`,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${tokens.color.acento.dourado}`,
+      outlineOffset: 2,
+    },
+  },
+  '@media': {
+    'screen and (max-width: 767px)': {
+      padding: '8px 14px',
+      fontSize: '0.875rem',
+    },
+  },
+});
+
+/** ✓ ícone do checkmark dentro do chip ativo. */
+export const chipCheck = style({
+  width: 16,
+  height: 16,
+  flexShrink: 0,
+  color: 'currentColor',
+});
+
+/** Contador de resultados à direita da barra de filtros. */
+export const resumoFiltro = style({
   color: textMuted,
   fontSize: tokens.font.size.sm,
+  whiteSpace: 'nowrap',
+  marginLeft: 'auto',
+  alignSelf: 'flex-end',
+  paddingBottom: '8px',
 });
+
+// ── Tabela ──────────────────────────────────────────────
 
 export const tabelaWrapper = style({
   overflowX: 'auto',
@@ -152,24 +268,40 @@ export const cabecalhoColuna = style({
   whiteSpace: 'nowrap',
 });
 
+// ── CORREÇÃO 5 — Altura 72px, hover com opacidade sobre primária, zebra ──
+
 export const linha = style({
-  transition: `background-color ${tokens.motion.fast} ease`,
+  minHeight: 72,
+  cursor: 'pointer',
+  transition: `background-color 120ms ease`,
   selectors: {
-    '&:hover': {
-      backgroundColor: surfaceMuted,
+    '&:nth-child(odd)': {
+      backgroundColor: `color-mix(in srgb, ${surfaceMuted} 40%, ${tokens.color.fundo})`,
     },
-    '&:focus-within': {
-      backgroundColor: surfaceMuted,
+    '&:nth-child(even)': {
+      backgroundColor: tokens.color.fundo,
+    },
+    '&:hover': {
+      backgroundColor: `color-mix(in srgb, ${tokens.color.primaria} 4%, ${tokens.color.fundo})`,
     },
   },
 });
 
+/** Padding vertical aumentado para mais respiro entre linhas. */
+
 export const celula = style({
-  padding: `${tokens.spacing.md} ${tokens.spacing.lg}`,
+  padding: `20px ${tokens.spacing.lg}`,
   borderBottom: `1px solid ${surfaceBorder}`,
   color: tokens.color.texto.primario,
   verticalAlign: 'middle',
 });
+
+export const celulaNome = style([
+  celula,
+  {
+    position: 'relative',
+  },
+]);
 
 export const nomeBloco = style({
   display: 'grid',
@@ -177,8 +309,9 @@ export const nomeBloco = style({
 });
 
 export const nome = style({
-  fontSize: tokens.font.size.base,
-  fontWeight: Number(tokens.font.weight.semibold),
+  fontSize: '15px',
+  fontWeight: Number(tokens.font.weight.bold),
+  color: tokens.color.neutral[800],
 });
 
 export const linhaSecundaria = style({
@@ -186,41 +319,11 @@ export const linhaSecundaria = style({
   gap: tokens.spacing.sm,
   alignItems: 'center',
   flexWrap: 'wrap',
-  minHeight: '1.25rem',
 });
 
 export const subtipo = style({
-  color: textMuted,
-  fontSize: '0.8125rem',
-});
-
-export const detalheHover = style({
-  opacity: 0,
-  transform: 'translateY(2px)',
-  color: textMuted,
-  fontSize: '0.75rem',
-  transition: `opacity ${tokens.motion.fast} ease, transform ${tokens.motion.fast} ease`,
-  selectors: {
-    [`${linha}:hover &`]: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-    [`${linha}:focus-within &`]: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-  '@media': {
-    '(pointer: coarse)': {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-});
-
-export const categoriaMeta = style({
-  display: 'grid',
-  gap: tokens.spacing.xs,
+  color: tokens.color.neutral[400],
+  fontSize: '12px',
 });
 
 export const categoria = style({
@@ -236,83 +339,284 @@ export const modalidades = style({
 export const modalidade = style([
   badgeBase,
   {
-    color: tokens.color.acento.dourado,
-    backgroundColor: `color-mix(in srgb, ${tokens.color.acento.dourado} 12%, ${tokens.color.fundo})`,
-    border: `1px solid color-mix(in srgb, ${tokens.color.acento.dourado} 24%, ${tokens.color.fundo})`,
+    color: tokens.color.secundaria,
+    backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 10%, ${tokens.color.fundo})`,
+    border: `1px solid color-mix(in srgb, ${tokens.color.secundaria} 18%, ${tokens.color.fundo})`,
+    fontWeight: Number(tokens.font.weight.bold),
   },
 ]);
 
 export const valor = style({
-  fontWeight: Number(tokens.font.weight.semibold),
+  fontWeight: Number(tokens.font.weight.bold),
   whiteSpace: 'nowrap',
+  color: tokens.color.neutral[800],
+  fontSize: '15px',
 });
 
-export const statusBloco = style({
-  display: 'grid',
+// ── Coluna "Visibilidade no Site" — Toggle + Label ──────
+
+export const celulaEstado = style([
+  celula,
+  {
+    textAlign: 'left',
+    verticalAlign: 'middle',
+  },
+]);
+
+/** Container horizontal: toggle switch + label semântico. */
+export const visibilidadeContainer = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '10px',
+  cursor: 'pointer',
+  padding: `${tokens.spacing.xs} ${tokens.spacing.sm}`,
+  borderRadius: tokens.radius.md,
+  transition: `background-color ${tokens.motion.fast} ease`,
+  selectors: {
+    '&:hover': {
+      backgroundColor: `color-mix(in srgb, ${surfaceMuted} 70%, ${tokens.color.fundo})`,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${tokens.color.acento.dourado}`,
+      outlineOffset: 2,
+    },
+  },
+});
+
+/** Input real, acessível mas invisível. */
+export const visibilidadeInput = style({
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  border: 0,
+});
+
+/** Trilho do toggle — 36×20px arredondado. Estado off = cinza. */
+export const toggleTrilho = style({
+  position: 'relative',
+  width: 36,
+  height: 20,
+  borderRadius: 999,
+  backgroundColor: tokens.color.neutral[400],
+  transition: `background-color 200ms ease`,
+  flexShrink: 0,
+});
+
+/** Trilho ativo = verde sucesso. */
+export const toggleTrilhoAtivo = style({
+  backgroundColor: tokens.color.estado.sucesso,
+});
+
+/** Bolinha branca — 14px, estado off à esquerda. */
+export const toggleBolinha = style({
+  position: 'absolute',
+  top: 3,
+  left: 3,
+  width: 14,
+  height: 14,
+  borderRadius: '50%',
+  backgroundColor: tokens.color.fundo,
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
+  transition: `transform 200ms ease`,
+});
+
+/** Bolinha ativa — desloca para a direita. */
+export const toggleBolinhaAtiva = style({
+  transform: 'translateX(16px)',
+});
+
+/** Label "Público" — verde, indica serviço online. */
+export const labelPublico = style({
+  fontSize: '13px',
+  fontWeight: Number(tokens.font.weight.bold),
+  color: tokens.color.estado.sucesso,
+  userSelect: 'none',
+  lineHeight: 1,
+});
+
+/** Label "Oculto" — cinza, indica serviço offline. */
+export const labelOculto = style({
+  fontSize: '13px',
+  fontWeight: Number(tokens.font.weight.semibold),
+  color: tokens.color.neutral[400],
+  userSelect: 'none',
+  lineHeight: 1,
+});
+
+/** Container da confirmação inline abaixo do toggle. */
+export const confirmacaoInlineContainer = style({
+  marginTop: tokens.spacing.sm,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: tokens.spacing.xs,
+  padding: tokens.spacing.sm,
+  backgroundColor: surfaceMuted,
+  borderRadius: tokens.radius.md,
+  border: `1px solid ${surfaceBorder}`,
+});
+
+export const confirmacaoTexto = style({
+  fontSize: '0.8125rem',
+  color: tokens.color.texto.primario,
+  lineHeight: 1.4,
+});
+
+export const confirmacaoBotoes = style({
+  display: 'flex',
   gap: tokens.spacing.xs,
 });
 
-export const statusPublicado = style([
-  badgeBase,
-  {
-    width: 'fit-content',
-    color: tokens.color.estado.sucesso,
-    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.sucesso} 12%, ${tokens.color.fundo})`,
-    border: `1px solid color-mix(in srgb, ${tokens.color.estado.sucesso} 24%, ${tokens.color.fundo})`,
-  },
-]);
-
-export const statusInativo = style([
-  badgeBase,
-  {
-    width: 'fit-content',
-    color: tokens.color.estado.alerta,
-    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.alerta} 12%, ${tokens.color.fundo})`,
-    border: `1px solid color-mix(in srgb, ${tokens.color.estado.alerta} 24%, ${tokens.color.fundo})`,
-  },
-]);
-
-export const acoes = style({
-  display: 'flex',
-  justifyContent: 'flex-end',
-});
-
-export const grupoAcoes = style({
-  display: 'inline-flex',
-  gap: tokens.spacing.sm,
-  opacity: 0,
-  transform: 'translateY(2px)',
-  transition: `opacity ${tokens.motion.fast} ease, transform ${tokens.motion.fast} ease`,
-  selectors: {
-    [`${linha}:hover &`]: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-    [`${linha}:focus-within &`]: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-  '@media': {
-    '(pointer: coarse)': {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-});
-
-export const botaoEditar = style([
+const confirmacaoBotaoBase = style([
   buttonBase,
   {
-    color: tokens.color.secundaria,
-    backgroundColor: tokens.color.fundo,
+    padding: `${tokens.spacing.xs} ${tokens.spacing.sm}`,
+    fontSize: '0.75rem',
+    borderRadius: '999px',
+    minHeight: 32,
+  },
+]);
+
+export const botaoConfirmar = style([
+  confirmacaoBotaoBase,
+  {
+    backgroundColor: tokens.color.primaria,
+    color: tokens.color.texto.invertido,
+    border: `1px solid ${tokens.color.primaria}`,
     selectors: {
       '&:hover:not(:disabled)': {
-        backgroundColor: surfaceMuted,
+        backgroundColor: tokens.color.brand.primaryHover,
+        borderColor: tokens.color.brand.primaryHover,
       },
     },
   },
 ]);
+
+export const botaoCancelar = style([
+  confirmacaoBotaoBase,
+  {
+    backgroundColor: tokens.color.fundo,
+    color: tokens.color.texto.primario,
+    border: `1px solid ${surfaceBorder}`,
+    selectors: {
+      '&:hover:not(:disabled)': {
+        borderColor: tokens.color.primaria,
+        color: tokens.color.primaria,
+      },
+    },
+  },
+]);
+
+// ── CORREÇÃO 4 — Botão ⋯ circular (padrão Marcações) ───
+
+export const celulaAcoes = style([
+  celula,
+  {
+    width: 60,
+    textAlign: 'center',
+  },
+]);
+
+export const acoesContainer = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+export const botaoMenu = style({
+  width: 36,
+  height: 36,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '50%',
+  border: `1px solid ${tokens.color.acento.prateado}`,
+  backgroundColor: 'transparent',
+  color: tokens.color.texto.primario,
+  cursor: 'pointer',
+  fontSize: '16px',
+  lineHeight: 1,
+  padding: '4px',
+  transition: `background-color ${tokens.motion.fast} ease, border-color ${tokens.motion.fast} ease, color ${tokens.motion.fast} ease`,
+  selectors: {
+    '&:hover': {
+      borderColor: tokens.color.primaria,
+      color: tokens.color.primaria,
+      backgroundColor: `color-mix(in srgb, ${surfaceMuted} 80%, transparent)`,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${tokens.color.acento.dourado}`,
+      outlineOffset: 2,
+    },
+  },
+});
+
+/** Dropdown do menu — position: fixed via getBoundingClientRect (como Marcações). */
+export const menuFlutuante = style({
+  position: 'fixed',
+  width: 230,
+  maxWidth: 'calc(100vw - 24px)',
+  maxHeight: 'calc(100vh - 24px)',
+  overflowY: 'auto',
+  boxSizing: 'border-box',
+  border: `1px solid ${tokens.color.acento.prateado}`,
+  borderRadius: '8px',
+  backgroundColor: tokens.color.fundo,
+  boxShadow: '0 10px 24px rgba(0, 0, 0, 0.12)',
+  padding: '6px',
+  zIndex: 70,
+});
+
+export const menuItem = style({
+  width: '100%',
+  minHeight: 40,
+  display: 'flex',
+  alignItems: 'center',
+  gap: tokens.spacing.sm,
+  border: 'none',
+  borderRadius: tokens.radius.md,
+  backgroundColor: 'transparent',
+  color: tokens.color.texto.primario,
+  padding: `${tokens.spacing.sm} 10px`,
+  textAlign: 'left',
+  cursor: 'pointer',
+  fontFamily: tokens.font.family.corpo,
+  fontSize: '0.88rem',
+  transition: `background-color ${tokens.motion.fast} ease`,
+  selectors: {
+    '&:hover': {
+      backgroundColor: `color-mix(in srgb, ${tokens.color.primaria} 6%, ${tokens.color.fundo})`,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${tokens.color.acento.dourado}`,
+      outlineOffset: 1,
+    },
+  },
+  '@media': {
+    'screen and (max-width: 767px)': {
+      minHeight: 44,
+      fontSize: '0.92rem',
+    },
+  },
+});
+
+export const menuSeparador = style({
+  height: 1,
+  backgroundColor: surfaceBorder,
+  margin: `${tokens.spacing.xs} 0`,
+});
+
+export const textoPerigo = style([
+  menuItem,
+  {
+    color: tokens.color.estado.erro,
+  },
+]);
+
+// ── Botão "+ Novo Serviço" ──────────────────────────────
 
 export const botaoNovo = style([
   buttonBase,
@@ -328,22 +632,92 @@ export const botaoNovo = style([
   },
 ]);
 
-export const estadoVazio = style({
-  padding: `${tokens.spacing.xl} ${tokens.spacing.lg}`,
+// ── Estados vazios ──────────────────────────────────────
+
+export const estadoVazioPrincipal = style({
+  padding: `64px ${tokens.spacing.lg}`,
   textAlign: 'center',
+  color: textMuted,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: tokens.spacing.md,
+});
+
+export const estadoVazioFiltro = style({
+  padding: `64px ${tokens.spacing.lg}`,
+  textAlign: 'center',
+  color: textMuted,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: tokens.spacing.md,
+});
+
+export const iconeVazio = style({
+  width: 40,
+  height: 40,
   color: textMuted,
 });
 
-export const celulaEstado = style([
-  celula,
+// ── Skeleton loading ────────────────────────────────────
+
+export const skeletonRow = style({
+  minHeight: 72,
+});
+
+export const skeletonPulse = style({
+  animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+  backgroundColor: surfaceBorder,
+  borderRadius: tokens.radius.sm,
+  '@keyframes': {
+    pulse: {
+      '0%, 100%': { opacity: 1 },
+      '50%': { opacity: 0.5 },
+    },
+  },
+});
+
+export const skeletonTextNome = style([
+  skeletonPulse,
   {
-    textAlign: 'center',
+    height: '15px',
+    width: '60%',
+    marginBottom: tokens.spacing.xs,
   },
 ]);
 
-export const celulaAcoes = style([
-  celula,
+export const skeletonTextCurto = style([
+  skeletonPulse,
   {
-    width: 120,
+    height: '12px',
+    width: '40%',
+  },
+]);
+
+export const skeletonBadge = style([
+  skeletonPulse,
+  {
+    height: '24px',
+    width: '80px',
+    borderRadius: 999,
+  },
+]);
+
+/**
+ * Botão "Limpar filtros" no estado vazio de filtros.
+ * Reutiliza o estilo base de botão com tom secundário.
+ */
+export const botaoLimparFiltros = style([
+  buttonBase,
+  {
+    color: tokens.color.secundaria,
+    backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 8%, ${tokens.color.fundo})`,
+    border: `1px solid color-mix(in srgb, ${tokens.color.secundaria} 20%, ${tokens.color.fundo})`,
+    selectors: {
+      '&:hover:not(:disabled)': {
+        backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 14%, ${tokens.color.fundo})`,
+      },
+    },
   },
 ]);

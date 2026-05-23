@@ -18,6 +18,7 @@ interface ListarSlotsPublicosParams {
   readonly serviceId: string;
   readonly dataISO: string;
   readonly modality?: ModalidadeAtendimento | 'ANY';
+  readonly includeUnavailable?: boolean;
 }
 
 export const publicQueryKeys = {
@@ -26,8 +27,9 @@ export const publicQueryKeys = {
   slots: (
     serviceId: string,
     dataISO: string,
-    modality: ModalidadeAtendimento | 'ANY'
-  ) => ['public', 'slots', serviceId, dataISO, modality] as const,
+    modality: ModalidadeAtendimento | 'ANY',
+    includeUnavailable = false
+  ) => ['public', 'slots', serviceId, dataISO, modality, includeUnavailable] as const,
 };
 
 export async function listarCategoriasPublicas(): Promise<RespostaCategoria[]> {
@@ -66,6 +68,7 @@ export async function listarSlotsPublicos({
   serviceId,
   dataISO,
   modality = 'ANY',
+  includeUnavailable = false,
 }: ListarSlotsPublicosParams): Promise<RespostaDisponibilidadePublica> {
   const [ano, mes, dia] = dataISO.split('-').map(Number);
   const dataSeguinte = new Date(ano, mes - 1, dia + 1);
@@ -76,6 +79,7 @@ export async function listarSlotsPublicos({
     from: dataISO,
     to: toISO,
     modality,
+    includeUnavailable,
   };
 
   try {

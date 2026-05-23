@@ -24,6 +24,7 @@ export interface SlotDisponivel {
   readonly startAt: string;
   readonly endAt: string;
   readonly modalitiesAvailable: ModalidadeAtendimento[];
+  readonly available?: boolean;
 }
 
 export interface RespostaDisponibilidadePublica {

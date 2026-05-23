@@ -30,12 +30,13 @@ export interface BookingAdminCustomer {
 
 export interface BookingAdminItem {
   readonly id: string;
+  readonly serviceId: string;
   readonly serviceName: string;
   readonly customer: BookingAdminCustomer;
   readonly modality: BookingModality;
   readonly startAt: string;
   readonly endAt: string;
-  readonly status: BookingStatus;
+  readonly status: BookingStatus | null;
   readonly priceCents: number;
   readonly currency: string;
   readonly adminNotes: string | null;
@@ -47,6 +48,12 @@ export interface BookingsFilters {
   readonly to?: string;
   readonly page?: number;
   readonly size?: number;
+}
+
+export interface RescheduleBookingPayload {
+  readonly id: string;
+  readonly startAt: string;
+  readonly adminNotes?: string;
 }
 
 export const bookingsQueryKeys = {
@@ -100,6 +107,31 @@ export function useUpdateBookingStatus() {
         new_status: newStatus,
         admin_notes: adminNotes,
       });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingsQueryKeys.all });
+    },
+  });
+}
+
+export function useRescheduleBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    BookingAdminItem,
+    AxiosError<ProblemDetails>,
+    RescheduleBookingPayload
+  >({
+    mutationFn: async ({ id, startAt, adminNotes }) => {
+      const { data } = await apiClient.patch<BookingAdminItem>(
+        `/admin/bookings/${id}/reschedule`,
+        {
+          start_at: startAt,
+          admin_notes: adminNotes,
+        }
+      );
+
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bookingsQueryKeys.all });

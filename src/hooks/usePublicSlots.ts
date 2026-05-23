@@ -8,15 +8,17 @@ interface UsePublicSlotsParams {
   readonly serviceId?: string;
   readonly dataISO?: string;
   readonly modality?: ModalidadeAtendimento | 'ANY';
+  readonly includeUnavailable?: boolean;
 }
 
 export function usePublicSlots({
   serviceId,
   dataISO,
   modality = 'ANY',
+  includeUnavailable = false,
 }: UsePublicSlotsParams) {
   return useQuery<SlotDisponivel[], AxiosError<ProblemDetails>>({
-    queryKey: publicQueryKeys.slots(serviceId ?? '', dataISO ?? '', modality),
+    queryKey: publicQueryKeys.slots(serviceId ?? '', dataISO ?? '', modality, includeUnavailable),
     queryFn: async () => {
       if (!serviceId || !dataISO) {
         return [];
@@ -26,6 +28,7 @@ export function usePublicSlots({
         serviceId,
         dataISO,
         modality,
+        includeUnavailable,
       });
 
       return resposta.slots;

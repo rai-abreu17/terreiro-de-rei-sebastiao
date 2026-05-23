@@ -21,6 +21,8 @@ globalStyle('body', {
   lineHeight: 1.5,
   WebkitFontSmoothing: 'antialiased',
   MozOsxFontSmoothing: 'grayscale',
+  WebkitTapHighlightColor: 'transparent',
+  overscrollBehaviorY: 'contain',
 });
 
 globalStyle('#root', {
@@ -46,6 +48,19 @@ globalStyle('button, input, textarea, select', {
   font: 'inherit',
 });
 
+globalStyle('input, select, textarea', {
+  fontSize: 'max(16px, 1em)',
+});
+
+globalStyle('[data-scrollable="true"]', {
+  WebkitOverflowScrolling: 'touch',
+});
+
+globalStyle('button:active:not(:disabled)', {
+  opacity: 0.7,
+  transform: 'scale(0.97)',
+});
+
 globalStyle('::selection', {
   backgroundColor: `${tokens.color.acento.dourado}55`,
   color: tokens.color.texto.primario,
@@ -53,4 +68,5 @@ globalStyle('::selection', {
 
 globalStyle('*', {
   boxSizing: 'border-box',
+  WebkitTapHighlightColor: 'transparent',
 });

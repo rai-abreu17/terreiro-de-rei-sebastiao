@@ -3,8 +3,8 @@ export interface NavbarProps {
   nomeAdministrador: string;
   /** Título principal exibido no cabeçalho */
   titulo?: string;
-  /** Callback para abrir o menu em dispositivos móveis */
-  aoAbrirMenu: () => void;
   /** Callback para a ação de logout */
   aoSair: () => void;
+  /** Callback opcional para abrir configurações (avatar menu mobile) */
+  aoAbrirConfiguracoes?: () => void;
 }

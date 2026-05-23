@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, CalendarCog, List, NotebookTabs } from 'lucide-react';
 import { Sidebar } from '@/components/ui/Sidebar/Sidebar';
 import { Navbar } from '@/components/ui/Navbar/Navbar';
@@ -16,25 +16,15 @@ const ITENS_MENU: ItemNavegacao[] = [
 
 export function AdminLayout(): React.ReactElement {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user, logout } = useAuth();
-  const [menuMobileAberto, setMenuMobileAberto] = useState(false);
-
-  useEffect(() => {
-    setMenuMobileAberto(false);
-  }, [location.pathname]);
 
   const nomeAdministrador = user?.displayName?.trim() || user?.email || 'Administradora';
 
   const aoSair = () => {
     void logout().finally(() => {
-      setMenuMobileAberto(false);
       navigate('/admin/login', { replace: true });
     });
   };
-
-  const alternarMenu = () => setMenuMobileAberto((estadoAtual) => !estadoAtual);
-  const fecharMenu = () => setMenuMobileAberto(false);
 
   return (
     <div className={estilos.layoutContainer}>
@@ -45,31 +35,9 @@ export function AdminLayout(): React.ReactElement {
         variante="fixa"
       />
 
-      {menuMobileAberto ? (
-        <>
-          <button
-            type="button"
-            className={estilos.drawerOverlay}
-            onClick={fecharMenu}
-            aria-label="Fechar menu de navegação"
-          />
-
-          <div className={estilos.drawerContent}>
-            <Sidebar
-              itens={ITENS_MENU}
-              nomeAdministrador={nomeAdministrador}
-              aoSair={aoSair}
-              aoSelecionarItem={fecharMenu}
-              variante="gaveta"
-            />
-          </div>
-        </>
-      ) : null}
-
       <div className={estilos.mainContent}>
         <Navbar
           nomeAdministrador={nomeAdministrador}
-          aoAbrirMenu={alternarMenu}
           aoSair={aoSair}
         />
 
@@ -77,6 +45,37 @@ export function AdminLayout(): React.ReactElement {
           <Outlet />
         </main>
       </div>
+
+      <nav className={estilos.bottomNav} aria-label="Navegação principal mobile">
+        {ITENS_MENU.map((item) => (
+          <NavLink
+            key={item.caminho}
+            to={item.caminho}
+            end={item.caminho === '/admin'}
+            className={({ isActive }) =>
+              isActive
+                ? `${estilos.bottomNavLink} ${estilos.bottomNavLinkAtivo}`
+                : estilos.bottomNavLink
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={
+                    isActive
+                      ? `${estilos.bottomNavIconWrap} ${estilos.bottomNavIconWrapAtivo}`
+                      : estilos.bottomNavIconWrap
+                  }
+                  aria-hidden="true"
+                >
+                  {item.icone}
+                </span>
+                <span>{item.rotulo === 'Agenda de Horários' ? 'Agenda' : item.rotulo}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }

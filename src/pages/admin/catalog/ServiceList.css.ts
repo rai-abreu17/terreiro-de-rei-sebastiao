@@ -72,6 +72,12 @@ export const cabecalho = style({
   alignItems: 'flex-start',
   gap: tokens.spacing.md,
   flexWrap: 'wrap',
+  '@media': {
+    'screen and (max-width: 767px)': {
+      flexDirection: 'column',
+      width: '100%',
+    },
+  },
 });
 
 export const blocoTitulo = style({
@@ -629,6 +635,13 @@ export const botaoNovo = style([
         backgroundColor: tokens.color.brand.primaryHover,
       },
     },
+    '@media': {
+      'screen and (max-width: 767px)': {
+        width: '100%',
+        minHeight: 48,
+        marginTop: tokens.spacing.sm,
+      },
+    },
   },
 ]);
 
@@ -717,6 +730,228 @@ export const botaoLimparFiltros = style([
     selectors: {
       '&:hover:not(:disabled)': {
         backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 14%, ${tokens.color.fundo})`,
+      },
+    },
+  },
+]);
+
+// ── Mobile e Tablet ─────────────────────────────────────
+
+export const containerFiltrosMobile = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: tokens.spacing.md,
+  width: '100%',
+  padding: tokens.spacing.md,
+  backgroundColor: tokens.color.fundo,
+  border: `1px solid ${surfaceBorder}`,
+  borderRadius: tokens.radius.md,
+});
+
+export const labelSelectMobile = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: tokens.spacing.xs,
+});
+
+export const microLabel = style({
+  color: tokens.color.neutral[500],
+  fontSize: '11px',
+  fontWeight: Number(tokens.font.weight.bold),
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+});
+
+export const selectMobile = style({
+  width: '100%',
+  height: 44,
+  fontSize: '16px',
+  fontFamily: tokens.font.family.corpo,
+  borderRadius: tokens.radius.sm,
+  border: `1px solid ${surfaceBorder}`,
+  padding: `0 ${tokens.spacing.sm}`,
+  backgroundColor: tokens.color.fundo,
+  color: tokens.color.texto.primario,
+});
+
+export const colunaOcultaTablet = style({
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      display: 'none',
+    },
+  },
+});
+
+export const detalheOcultoDesktop = style({
+  display: 'none',
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      display: 'inline',
+    },
+  },
+});
+
+export const listaCardsMobile = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: tokens.spacing.sm,
+});
+
+export const cardMobile = style({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: tokens.color.fundo,
+  borderRadius: tokens.radius.md,
+  border: `1px solid ${surfaceBorder}`,
+  padding: tokens.spacing.md,
+  paddingLeft: 20,
+  boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+  overflow: 'hidden',
+});
+
+export const barraConsultation = style({
+  selectors: {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0, left: 0, bottom: 0, width: 4,
+      backgroundColor: tokens.color.acento.quente,
+    }
+  }
+});
+
+export const barraRitual = style({
+  selectors: {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0, left: 0, bottom: 0, width: 4,
+      backgroundColor: tokens.color.acento.frio,
+    }
+  }
+});
+
+export const cardHeader = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
+  gap: tokens.spacing.sm,
+});
+
+export const cardTitulo = style({
+  fontSize: '16px',
+  fontWeight: Number(tokens.font.weight.bold),
+  color: tokens.color.neutral[800],
+  display: 'block',
+  marginBottom: tokens.spacing.xs,
+});
+
+export const cardSubtitulo = style({
+  margin: 0,
+  fontSize: '12px',
+  color: textMuted,
+});
+
+export const cardDivisor = style({
+  border: 0,
+  height: 1,
+  backgroundColor: surfaceBorder,
+  margin: `${tokens.spacing.md} 0`,
+  width: '100%',
+});
+
+export const cardDetalhes = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: tokens.spacing.sm,
+  fontSize: '14px',
+  color: tokens.color.neutral[800],
+  marginBottom: tokens.spacing.sm,
+});
+
+export const cardRodapeToggle = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: tokens.spacing.md,
+  minHeight: 44,
+  cursor: 'pointer',
+});
+
+export const labelToggleMobile = style({
+  fontSize: '14px',
+  fontWeight: Number(tokens.font.weight.medium),
+  color: tokens.color.neutral[800],
+});
+
+export const sheetAvisoContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  gap: tokens.spacing.md,
+});
+
+export const sheetAvisoIcone = style({
+  color: tokens.color.estado.aviso,
+});
+
+export const sheetAvisoTitulo = style({
+  fontSize: '16px',
+  fontWeight: Number(tokens.font.weight.bold),
+  color: tokens.color.neutral[800],
+  margin: 0,
+});
+
+export const sheetAvisoTexto = style({
+  fontSize: '14px',
+  color: textMuted,
+  margin: 0,
+});
+
+export const sheetAvisoBotoes = style({
+  display: 'flex',
+  width: '100%',
+  gap: tokens.spacing.sm,
+  marginTop: tokens.spacing.sm,
+});
+
+export const sheetBotaoConfirmarPerigo = style([
+  buttonBase,
+  {
+    flex: 1,
+    minHeight: 44,
+    backgroundColor: tokens.color.fundo,
+    color: tokens.color.estado.erro,
+    border: `1px solid ${tokens.color.estado.erro}`,
+    selectors: {
+      '&:hover:not(:disabled)': {
+        backgroundColor: `color-mix(in srgb, ${tokens.color.estado.erro} 5%, ${tokens.color.fundo})`,
+      },
+    },
+  },
+]);
+
+export const sheetBotaoCancelarPerigo = style([
+  buttonBase,
+  {
+    flex: 1,
+    minHeight: 44,
+    backgroundColor: tokens.color.fundo,
+    color: textMuted,
+    border: `1px solid ${surfaceBorder}`,
+  },
+]);
+
+export const sheetBotaoAcao = style([
+  menuItem,
+  {
+    minHeight: 48,
+    borderBottom: `1px solid ${surfaceBorder}`,
+    borderRadius: 0,
+    selectors: {
+      '&:last-child': {
+        borderBottom: 'none',
       },
     },
   },

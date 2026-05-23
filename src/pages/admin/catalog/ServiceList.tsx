@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, MoreHorizontal, Search, List as ListIcon, Check } from 'lucide-react';
+import { Plus, MoreHorizontal, Search, List as ListIcon, Check, AlertTriangle } from 'lucide-react';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { Drawer } from '@/components/ui/Drawer/Drawer';
 import type { FiltrosServicoAdmin, RespostaServico, TipoServico } from '@/api/catalog.types';
 import { useCategories, useServices } from '@/hooks/useCatalog';
 import { formatMoney } from '@/lib/money';
@@ -21,6 +23,7 @@ const ROTULOS_MODALIDADE: Record<string, string> = {
 };
 
 export function ServiceList() {
+  const { isMobile, isTablet } = useBreakpoint();
   const { data: categories = [] } = useCategories();
 
   /** Chips de tipo — todos ativos por padrão. */
@@ -206,18 +209,55 @@ export function ServiceList() {
 
         {/* ── Tabela ────────────────────────────────────── */}
         <div className={styles.tabelaWrapper}>
-          <table className={styles.tabela}>
-            <thead>
-              <tr className={styles.linhaCabecalho}>
-                <th className={styles.cabecalhoColuna}>Nome</th>
-                <th className={styles.cabecalhoColuna}>Categoria</th>
-                <th className={styles.cabecalhoColuna}>Modalidade</th>
-                <th className={styles.cabecalhoColuna}>Duração</th>
-                <th className={styles.cabecalhoColuna}>Preço</th>
-                <th className={styles.cabecalhoColuna}>Visibilidade no Site</th>
-                <th className={styles.cabecalhoColuna}>Ações</th>
-              </tr>
-            </thead>
+          {isMobile ? (
+            <div className={styles.listaCardsMobile}>
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className={`${styles.cardMobile} ${styles.skeletonRow}`}>
+                    <div className={styles.skeletonTextNome} />
+                    <div className={styles.skeletonTextCurto} />
+                  </div>
+                ))
+              ) : servicesPage?.totalElements === 0 && !filtrosEstaoAtivos ? (
+                <div className={styles.estadoVazioPrincipal}>
+                  <ListIcon className={styles.iconeVazio} />
+                  <h3>Nenhum serviço cadastrado ainda.</h3>
+                  <p>Adicione o primeiro serviço da Casa para que os consulentes possam agendar.</p>
+                  <button className={styles.botaoNovo} onClick={() => navigate('/admin/catalog/services/new')}>
+                    ＋ Adicionar primeiro serviço
+                  </button>
+                </div>
+              ) : servicosFiltrados.length > 0 ? (
+                servicosFiltrados.map((service) => (
+                  <ServiceCardMobile
+                    key={service.id}
+                    service={service}
+                  />
+                ))
+              ) : (
+                <div className={styles.estadoVazioFiltro}>
+                  <Search className={styles.iconeVazio} />
+                  <h3>Nenhum serviço encontrado com esses filtros.</h3>
+                  <p>Tente mudar o tipo ou a categoria.</p>
+                  <button className={styles.botaoLimparFiltros} onClick={limparFiltros}>
+                    Limpar filtros
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <table className={styles.tabela}>
+              <thead>
+                <tr className={styles.linhaCabecalho}>
+                  <th className={styles.cabecalhoColuna}>Nome</th>
+                  <th className={`${styles.cabecalhoColuna} ${styles.colunaOcultaTablet}`}>Categoria</th>
+                  <th className={styles.cabecalhoColuna}>Modalidade</th>
+                  <th className={`${styles.cabecalhoColuna} ${styles.colunaOcultaTablet}`}>Duração</th>
+                  <th className={styles.cabecalhoColuna}>Preço</th>
+                  <th className={styles.cabecalhoColuna}>Visibilidade no Site</th>
+                  <th className={styles.cabecalhoColuna}>Ações</th>
+                </tr>
+              </thead>
             <tbody>
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
@@ -226,9 +266,9 @@ export function ServiceList() {
                       <div className={styles.skeletonTextNome} />
                       <div className={styles.skeletonTextCurto} />
                     </td>
-                    <td className={styles.celula}><div className={styles.skeletonTextCurto} /></td>
+                    <td className={`${styles.celula} ${styles.colunaOcultaTablet}`}><div className={styles.skeletonTextCurto} /></td>
                     <td className={styles.celula}><div className={styles.skeletonBadge} /></td>
-                    <td className={styles.celula} colSpan={4}></td>
+                    <td className={`${styles.celula} ${styles.colunaOcultaTablet}`} colSpan={4}></td>
                   </tr>
                 ))
               ) : servicesPage?.totalElements === 0 && !filtrosEstaoAtivos ? (
@@ -268,6 +308,7 @@ export function ServiceList() {
               )}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </section>
@@ -384,11 +425,13 @@ function ServiceRow({ service, idConfirmacaoAtiva, onAbrirConfirmacao }: Service
           <strong className={styles.nome}>{service.name}</strong>
           <div className={styles.linhaSecundaria}>
             <span className={styles.subtipo}>{ROTULOS_TIPO[service.type]}</span>
+            <span className={styles.detalheOcultoDesktop}> · {service.category.name}</span>
+            <span className={styles.detalheOcultoDesktop}> · {service.durationMin} min</span>
           </div>
         </div>
       </td>
 
-      <td className={styles.celula}>
+      <td className={`${styles.celula} ${styles.colunaOcultaTablet}`}>
         <span className={styles.categoria}>{service.category.name}</span>
       </td>
 
@@ -402,7 +445,7 @@ function ServiceRow({ service, idConfirmacaoAtiva, onAbrirConfirmacao }: Service
         </div>
       </td>
 
-      <td className={styles.celula}>{service.durationMin} min</td>
+      <td className={`${styles.celula} ${styles.colunaOcultaTablet}`}>{service.durationMin} min</td>
 
       <td className={styles.celula}>
         <span className={styles.valor}>{formatMoney(service.priceCents)}</span>
@@ -515,5 +558,199 @@ function ServiceRow({ service, idConfirmacaoAtiva, onAbrirConfirmacao }: Service
         </div>
       </td>
     </tr>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+//  COMPONENTE — Card Mobile
+// ══════════════════════════════════════════════════════════
+
+interface ServiceCardMobileProps {
+  readonly service: RespostaServico;
+}
+
+function ServiceCardMobile({ service }: ServiceCardMobileProps) {
+  const navigate = useNavigate();
+  const [drawerAcoesAberto, setDrawerAcoesAberto] = useState(false);
+  const [drawerExcluirAberto, setDrawerExcluirAberto] = useState(false);
+  const [drawerToggleAberto, setDrawerToggleAberto] = useState(false);
+  const [contagemRegressiva, setContagemRegressiva] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const corBarra = service.type === 'CONSULTATION' ? styles.barraConsultation : styles.barraRitual;
+
+  const iniciarContagem = useCallback((segundos: number, onComplete: () => void) => {
+    setContagemRegressiva(segundos);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setContagemRegressiva((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          onComplete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  const cancelarContagem = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  useEffect(() => {
+    return () => cancelarContagem();
+  }, [cancelarContagem]);
+
+  return (
+    <>
+      <div className={`${styles.cardMobile} ${corBarra}`} onClick={() => navigate(`/admin/catalog/services/${service.id}/edit`)}>
+        <div className={styles.cardHeader}>
+          <div>
+            <strong className={styles.cardTitulo}>{service.name}</strong>
+            <p className={styles.cardSubtitulo}>
+              {ROTULOS_TIPO[service.type]} · {service.category.name}
+            </p>
+          </div>
+          <button 
+            className={styles.botaoMenu} 
+            onClick={(e) => { e.stopPropagation(); setDrawerAcoesAberto(true); }}
+            aria-label="Opções do serviço"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+        </div>
+
+        <hr className={styles.cardDivisor} />
+
+        <div className={styles.cardDetalhes}>
+          <span>🕐 {service.durationMin} min</span>
+          <span>💰 {formatMoney(service.priceCents)}</span>
+        </div>
+        
+        <div className={styles.modalidades}>
+          {service.modalities.map((modality) => (
+            <span className={styles.modalidade} key={modality}>
+              {ROTULOS_MODALIDADE[modality] ?? modality}
+            </span>
+          ))}
+        </div>
+
+        <hr className={styles.cardDivisor} />
+
+        <div 
+          className={styles.cardRodapeToggle}
+          onClick={(e) => {
+            e.stopPropagation();
+            setDrawerToggleAberto(true);
+            iniciarContagem(5, () => setDrawerToggleAberto(false));
+          }}
+        >
+          <div
+            className={styles.visibilidadeContainer}
+            role="switch"
+            aria-checked={service.isPublished}
+            tabIndex={0}
+            style={{ padding: 0 }}
+          >
+            <span className={`${styles.toggleTrilho} ${service.isPublished ? styles.toggleTrilhoAtivo : ''}`}>
+              <span className={`${styles.toggleBolinha} ${service.isPublished ? service.isPublished ? styles.toggleBolinhaAtiva : '' : ''}`} />
+            </span>
+            <span className={styles.labelToggleMobile}>Visível no site</span>
+          </div>
+        </div>
+      </div>
+
+      <Drawer
+        open={drawerAcoesAberto}
+        title="Opções do serviço"
+        mobileVariant="compact"
+        onClose={() => setDrawerAcoesAberto(false)}
+      >
+        <button className={styles.sheetBotaoAcao} onClick={() => navigate(`/admin/catalog/services/${service.id}/edit`)}>
+          🔍 Ver detalhes
+        </button>
+        <button className={styles.sheetBotaoAcao} onClick={() => navigate(`/admin/catalog/services/${service.id}/edit`)}>
+          ✏️ Editar serviço
+        </button>
+        <button className={styles.sheetBotaoAcao} onClick={() => setDrawerAcoesAberto(false)}>
+          📋 Duplicar serviço
+        </button>
+        <button 
+          className={`${styles.sheetBotaoAcao} ${styles.textoPerigo}`} 
+          onClick={() => {
+            setDrawerAcoesAberto(false);
+            setDrawerExcluirAberto(true);
+            iniciarContagem(8, () => setDrawerExcluirAberto(false));
+          }}
+        >
+          ✕ Excluir serviço
+        </button>
+      </Drawer>
+
+      <Drawer
+        open={drawerExcluirAberto}
+        title="Confirmar exclusão"
+        mobileVariant="compact"
+        onClose={() => {
+          cancelarContagem();
+          setDrawerExcluirAberto(false);
+        }}
+      >
+        <div className={styles.sheetAvisoContainer}>
+          <AlertTriangle size={32} className={styles.sheetAvisoIcone} />
+          <h3 className={styles.sheetAvisoTitulo}>Excluir '{service.name}'?</h3>
+          <p className={styles.sheetAvisoTexto}>Esta ação não pode ser desfeita.</p>
+          <div className={styles.sheetAvisoBotoes}>
+            <button className={styles.sheetBotaoConfirmarPerigo} onClick={() => setDrawerExcluirAberto(false)}>
+              Sim, excluir
+            </button>
+            <button 
+              className={styles.sheetBotaoCancelarPerigo} 
+              onClick={() => {
+                cancelarContagem();
+                setDrawerExcluirAberto(false);
+              }}
+            >
+              Não excluir ({contagemRegressiva})
+            </button>
+          </div>
+        </div>
+      </Drawer>
+
+      <Drawer
+        open={drawerToggleAberto}
+        title="Alterar visibilidade"
+        mobileVariant="compact"
+        onClose={() => {
+          cancelarContagem();
+          setDrawerToggleAberto(false);
+        }}
+      >
+        <div className={styles.sheetAvisoContainer}>
+          <h3 className={styles.sheetAvisoTitulo}>
+            {service.isPublished ? `Ocultar '${service.name}' dos agendamentos?` : `Publicar '${service.name}' para agendamento?`}
+          </h3>
+          {service.isPublished && (
+            <p className={styles.sheetAvisoTexto}>Consulentes não poderão agendar este serviço.</p>
+          )}
+          <div className={styles.sheetAvisoBotoes}>
+            <button className={styles.botaoConfirmar} style={{ flex: 1, minHeight: 44, width: '100%', borderRadius: 999 }} onClick={() => setDrawerToggleAberto(false)}>
+              Confirmar
+            </button>
+            <button 
+              className={styles.botaoCancelar} 
+              style={{ flex: 1, minHeight: 44, width: '100%', borderRadius: 999 }}
+              onClick={() => {
+                cancelarContagem();
+                setDrawerToggleAberto(false);
+              }}
+            >
+              Cancelar ({contagemRegressiva})
+            </button>
+          </div>
+        </div>
+      </Drawer>
+    </>
   );
 }

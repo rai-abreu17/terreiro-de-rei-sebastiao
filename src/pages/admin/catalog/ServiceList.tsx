@@ -49,21 +49,15 @@ export function ServiceList() {
 
   /** Filtros enviados à API. */
   const filtrosApi = useMemo<FiltrosServicoAdmin>(() => {
-    const base: FiltrosServicoAdmin = {
+    return {
       page: 0,
       size: TAMANHO_PAGINA,
       sort: 'displayOrder,asc',
+      ...(tiposAtivos.size === 1 ? { type: [...tiposAtivos][0] } : {}),
+      ...(categoriasEfetivas.size === 1
+        ? { categoryId: [...categoriasEfetivas][0] }
+        : {}),
     };
-
-    if (tiposAtivos.size === 1) {
-      base.type = [...tiposAtivos][0];
-    }
-
-    if (categoriasEfetivas.size === 1) {
-      base.categoryId = [...categoriasEfetivas][0];
-    }
-
-    return base;
   }, [tiposAtivos, categoriasEfetivas]);
 
   const {

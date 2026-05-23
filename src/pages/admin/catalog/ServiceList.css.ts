@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { tokens } from '@theme/tokens.css';
 
 /**
@@ -168,7 +168,7 @@ export const chipAtivo = style({
   borderRadius: 999,
   fontSize: '14px',
   fontFamily: tokens.font.family.corpo,
-  fontWeight: Number(tokens.font.weight.medium),
+  fontWeight: Number(tokens.font.weight.semibold),
   cursor: 'pointer',
   border: `1px solid transparent`,
   backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 12%, ${tokens.color.fundo})`,
@@ -200,7 +200,7 @@ export const chipInativo = style({
   borderRadius: 999,
   fontSize: '14px',
   fontFamily: tokens.font.family.corpo,
-  fontWeight: Number(tokens.font.weight.medium),
+  fontWeight: Number(tokens.font.weight.semibold),
   cursor: 'pointer',
   border: `1px solid ${surfaceBorder}`,
   backgroundColor: tokens.color.fundo,
@@ -679,16 +679,15 @@ export const skeletonRow = style({
   minHeight: 72,
 });
 
+const pulseAnimation = keyframes({
+  '0%, 100%': { opacity: 1 },
+  '50%': { opacity: 0.5 },
+});
+
 export const skeletonPulse = style({
-  animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+  animation: `${pulseAnimation} 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
   backgroundColor: surfaceBorder,
   borderRadius: tokens.radius.sm,
-  '@keyframes': {
-    pulse: {
-      '0%, 100%': { opacity: 1 },
-      '50%': { opacity: 0.5 },
-    },
-  },
 });
 
 export const skeletonTextNome = style([
@@ -816,7 +815,7 @@ export const barraConsultation = style({
       content: '""',
       position: 'absolute',
       top: 0, left: 0, bottom: 0, width: 4,
-      backgroundColor: tokens.color.acento.quente,
+      backgroundColor: tokens.color.primaria,
     }
   }
 });
@@ -827,7 +826,7 @@ export const barraRitual = style({
       content: '""',
       position: 'absolute',
       top: 0, left: 0, bottom: 0, width: 4,
-      backgroundColor: tokens.color.acento.frio,
+      backgroundColor: tokens.color.secundaria,
     }
   }
 });
@@ -880,7 +879,7 @@ export const cardRodapeToggle = style({
 
 export const labelToggleMobile = style({
   fontSize: '14px',
-  fontWeight: Number(tokens.font.weight.medium),
+  fontWeight: Number(tokens.font.weight.semibold),
   color: tokens.color.neutral[800],
 });
 
@@ -893,7 +892,7 @@ export const sheetAvisoContainer = style({
 });
 
 export const sheetAvisoIcone = style({
-  color: tokens.color.estado.aviso,
+  color: tokens.color.estado.alerta,
 });
 
 export const sheetAvisoTitulo = style({

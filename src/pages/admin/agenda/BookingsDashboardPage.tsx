@@ -67,16 +67,6 @@ const labelsPeriodoMobile: Record<PeriodoFiltro, string> = {
   todos: 'Todos',
 };
 
-const opcoesStatus: ReadonlyArray<{ label: string; value: BookingStatus | '' }> = [
-  { label: 'Todos os Status', value: '' },
-  { label: 'Pendente', value: 'PENDING_PAYMENT' },
-  { label: 'Confirmado', value: 'CONFIRMED' },
-  { label: 'Atendido', value: 'COMPLETED' },
-  { label: 'Cancelado', value: 'CANCELLED' },
-  { label: 'Falta', value: 'NO_SHOW' },
-  { label: 'Expirado', value: 'EXPIRED' },
-];
-
 const dataFormatter = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
   month: '2-digit',
@@ -1086,7 +1076,6 @@ export const BookingsDashboardPage = () => {
   const [bookingDetalhes, setBookingDetalhes] = useState<BookingAdminItem | null>(null);
   const [bookingCancelamento, setBookingCancelamento] = useState<BookingAdminItem | null>(null);
   const [bookingRemarcacao, setBookingRemarcacao] = useState<BookingAdminItem | null>(null);
-  const [statusDropdownAberto, setStatusDropdownAberto] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const loadingTimeoutRef = useRef<number | null>(null);
 
@@ -1120,8 +1109,6 @@ export const BookingsDashboardPage = () => {
   const loadingTabela = isLoading || isFetching || carregando;
   const filtrosDesabilitados = loadingTabela || updateStatusMutation.isPending;
   const estadoVazio = obterEstadoVazio(periodo, selectedStatus);
-  const statusSelecionadoLabel =
-    opcoesStatus.find((opcao) => opcao.value === selectedStatus)?.label ?? 'Todos os Status';
   const descricaoFiltroAtual = useMemo(
     () => obterDescricaoFiltroAtual(periodo, selectedStatus),
     [periodo, selectedStatus]
@@ -1149,7 +1136,6 @@ export const BookingsDashboardPage = () => {
   useEffect(() => {
     const fechar = () => {
       setDropdownAberto(null);
-      setStatusDropdownAberto(false);
     };
     document.addEventListener('click', fechar);
     window.addEventListener('resize', fechar);
@@ -1184,7 +1170,6 @@ export const BookingsDashboardPage = () => {
     setSelectedStatus(status);
     setPage(0);
     setDropdownAberto(null);
-    setStatusDropdownAberto(false);
   };
 
   const handleToggleDropdown = (bookingId: string, trigger: HTMLElement) => {
@@ -1318,51 +1303,6 @@ export const BookingsDashboardPage = () => {
           </div>
         </div>
 
-        <span className={styles.filterDivider} aria-hidden="true" />
-
-        <div className={styles.statusFilterGroup} onClick={(event) => event.stopPropagation()}>
-          <span className={styles.filterLabel}>STATUS</span>
-          <div className={styles.statusSelectWrap}>
-            <button
-              type="button"
-              className={`${styles.statusSelectButton} ${selectedStatus ? styles.statusSelectButtonActive : ''}`}
-              aria-haspopup="listbox"
-              aria-expanded={statusDropdownAberto}
-              disabled={filtrosDesabilitados}
-              onClick={() => {
-                setDropdownAberto(null);
-                setStatusDropdownAberto((aberto) => !aberto);
-              }}
-            >
-              <span>{statusSelecionadoLabel}</span>
-              <span className={styles.selectChevron} aria-hidden="true">▼</span>
-            </button>
-
-            {statusDropdownAberto ? (
-              <div className={styles.statusMenu} role="listbox" aria-label="Filtrar por status">
-                {opcoesStatus.map((opcao) => {
-                  const selecionado = selectedStatus === opcao.value;
-
-                  return (
-                    <button
-                      key={opcao.value || 'todos'}
-                      type="button"
-                      className={`${styles.statusOption} ${selecionado ? styles.statusOptionActive : ''}`}
-                      role="option"
-                      aria-selected={selecionado}
-                      onClick={() => handleStatusChange(opcao.value)}
-                    >
-                      <span>{opcao.label}</span>
-                      {selecionado ? (
-                        <span className={styles.statusOptionCheck} aria-hidden="true">✓</span>
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        </div>
       </div>
 
       <p className={styles.filterFeedback}>{descricaoFiltroAtual}</p>

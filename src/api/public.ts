@@ -82,15 +82,19 @@ export async function listarSlotsPublicos({
     includeUnavailable,
   };
 
+  const endpoint = includeUnavailable
+    ? '/admin/availability/slots'
+    : '/availability/slots';
+
   try {
     const { data } = await apiClient.get<RespostaDisponibilidadePublica>(
-      '/availability/slots',
+      endpoint,
       { params }
     );
 
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (!includeUnavailable && axios.isAxiosError(error) && error.response?.status === 404) {
       const { data } = await apiClient.get<RespostaDisponibilidadePublica>(
         '/public/availability/slots',
         { params }

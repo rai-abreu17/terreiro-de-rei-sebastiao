@@ -20,9 +20,13 @@ export function usePublicBookingStatus({
         throw new Error('bookingId is required');
       }
 
+      if (!viewToken) {
+        throw new Error('viewToken is required');
+      }
+
       return getBookingStatus(bookingId, viewToken);
     },
-    enabled: Boolean(bookingId),
+    enabled: Boolean(bookingId && viewToken),
     refetchInterval: (query) =>
       query.state.data?.status === 'PENDING_PAYMENT' ? 5000 : false,
   });

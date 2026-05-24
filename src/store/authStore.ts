@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { limparAccessToken } from '@/auth/tokenStorage';
 import type { AuthStore } from './authStore.types';
 import { ESTADO_INICIAL_AUTH } from './authStore.types';
 
@@ -33,8 +32,6 @@ export const useAuthStore = create<AuthStore>()(
         ),
 
       limparSessao: () => {
-        limparAccessToken();
-
         set(
           {
             ...ESTADO_INICIAL_AUTH,

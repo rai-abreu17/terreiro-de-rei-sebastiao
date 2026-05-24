@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import axios, { type AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { apiClient } from '@/api/client';
 import type { ProblemDetails } from '@/api/catalog.types';
 import type {
@@ -97,31 +97,16 @@ export async function createBooking(
 
 export async function getBookingStatus(
   bookingId: string,
-  viewToken?: string
+  viewToken: string
 ): Promise<BookingResponse> {
-  try {
-    const { data } = await apiClient.get<BookingResponseWire>(
-      `/bookings/${bookingId}`,
-      {
-      params: viewToken ? { vt: viewToken } : undefined,
-      }
-    );
-
-    return normalizeBookingResponse(data);
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      const { data } = await apiClient.get<BookingResponseWire>(
-        `/public/bookings/${bookingId}`,
-        {
-          params: viewToken ? { vt: viewToken } : undefined,
-        }
-      );
-
-      return normalizeBookingResponse(data);
+  const { data } = await apiClient.get<BookingResponseWire>(
+    `/public/bookings/${bookingId}`,
+    {
+      params: { vt: viewToken },
     }
+  );
 
-    throw error;
-  }
+  return normalizeBookingResponse(data);
 }
 
 // ══════════════════════════════════════════════════

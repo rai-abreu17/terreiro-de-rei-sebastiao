@@ -1,6 +1,5 @@
 import type { AxiosRequestConfig, AxiosError, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios';
 import { apiClient } from './client';
-import { limparAccessToken, registrarAccessToken } from '@/auth/tokenStorage';
 import { registrarCsrfToken } from '@/auth/csrf';
 
 export interface AuthFieldError {
@@ -39,22 +38,6 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
   __skipAuthRefresh?: boolean;
 }
 
-function registrarTokenDaResposta(
-  headers: AxiosResponseHeaders | RawAxiosResponseHeaders
-): void {
-  const authorization = headers?.authorization;
-  const valorHeader = Array.isArray(authorization) ? authorization[0] : authorization;
-
-  if (typeof valorHeader !== 'string') {
-    return;
-  }
-
-  const [, token] = valorHeader.match(/^Bearer\s+(.+)$/i) ?? [];
-  if (token) {
-    registrarAccessToken(token);
-  }
-}
-
 function registrarCsrfDaResposta(
   headers: AxiosResponseHeaders | RawAxiosResponseHeaders
 ): void {
@@ -72,7 +55,6 @@ export function login(
   return apiClient
     .post<AuthEnvelope>('/auth/login', credentials, config)
     .then((response) => {
-      registrarTokenDaResposta(response.headers);
       registrarCsrfDaResposta(response.headers);
       return response.data;
     });
@@ -81,7 +63,6 @@ export function login(
 export function logout(config?: ApiRequestConfig): Promise<void> {
   return apiClient
     .post('/auth/logout', undefined, config)
-    .finally(limparAccessToken)
     .then(() => undefined);
 }
 
@@ -96,7 +77,6 @@ export function refresh(config?: ApiRequestConfig): Promise<AuthEnvelope> {
   return apiClient
     .post<AuthEnvelope>('/auth/refresh', undefined, config)
     .then((response) => {
-      registrarTokenDaResposta(response.headers);
       registrarCsrfDaResposta(response.headers);
       return response.data;
     });

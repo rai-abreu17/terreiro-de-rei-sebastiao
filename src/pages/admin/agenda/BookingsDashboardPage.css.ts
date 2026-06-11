@@ -111,11 +111,26 @@ export const statusBadge = styleVariants({
 });
 
 export const paymentBadge = styleVariants({
-  APPROVED: [statusBadgeBase, { backgroundColor: '#E8F5E9', color: '#2E7D32' }],
-  PENDING: [statusBadgeBase, { backgroundColor: '#FFF9C4', color: '#F57F17' }],
-  CREATED: [statusBadgeBase, { backgroundColor: '#F5F5F5', color: '#616161' }],
-  REJECTED: [statusBadgeBase, { backgroundColor: '#FFEBEE', color: '#C62828' }],
-  REFUNDED: [statusBadgeBase, { backgroundColor: '#F3E5F5', color: '#6A1B9A' }],
+  APPROVED: [statusBadgeBase, {
+    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.sucesso} 12%, ${tokens.color.fundo})`,
+    color: tokens.color.estado.sucesso,
+  }],
+  PENDING: [statusBadgeBase, {
+    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.alerta} 14%, ${tokens.color.fundo})`,
+    color: tokens.color.estado.alerta,
+  }],
+  CREATED: [statusBadgeBase, {
+    backgroundColor: tokens.color.neutral[50],
+    color: tokens.color.neutral[600],
+  }],
+  REJECTED: [statusBadgeBase, {
+    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.erro} 10%, ${tokens.color.fundo})`,
+    color: tokens.color.estado.erro,
+  }],
+  REFUNDED: [statusBadgeBase, {
+    backgroundColor: `color-mix(in srgb, ${tokens.color.secundaria} 10%, ${tokens.color.fundo})`,
+    color: tokens.color.secundaria,
+  }],
 });
 
 export const iconButton = style({

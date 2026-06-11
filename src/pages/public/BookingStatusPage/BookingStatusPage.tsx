@@ -22,7 +22,7 @@ import {
 
 function IconeAguardando() {
   return (
-    <div className={`${iconeStatus.pendente} ${pulseAnimation}`} aria-label="A aguardar pagamento">
+    <div className={`${iconeStatus.pendente} ${pulseAnimation}`} aria-label="Aguardando pagamento">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
@@ -76,7 +76,7 @@ export function BookingStatusPage(): React.ReactElement {
       <main className={container}>
         <div className={cartao}>
           <h1 className={titulo}>Reserva não encontrada</h1>
-          <p className={descricao}>Não foi possível identificar a marcação a partir do link recebido.</p>
+          <p className={descricao}>Não foi possível identificar a reserva a partir do link recebido.</p>
           <div className={actions}>
             <Link className={botaoAcao} to="/agendar">
               Voltar ao agendamento
@@ -92,8 +92,8 @@ export function BookingStatusPage(): React.ReactElement {
       <main className={container} aria-busy="true">
         <div className={cartao}>
           <span className={statusEyebrow}>Acompanhar reserva</span>
-          <h1 className={titulo}>A consultar o estado do pagamento</h1>
-          <p className={descricao}>Estamos a procurar a informação mais recente da sua reserva.</p>
+          <h1 className={titulo}>Consultando o status do pagamento</h1>
+          <p className={descricao}>Estamos buscando as informações mais recentes da sua reserva.</p>
         </div>
       </main>
     );
@@ -105,8 +105,8 @@ export function BookingStatusPage(): React.ReactElement {
         <div className={cartao}>
           <IconeExpirado />
           <span className={statusEyebrow}>Reserva indisponível</span>
-          <h1 className={titulo}>Não foi possível carregar o estado da marcação</h1>
-          <p className={descricao}>Verifique o link recebido ou tente novamente dentro de instantes.</p>
+          <h1 className={titulo}>Não foi possível carregar o status da reserva</h1>
+          <p className={descricao}>Verifique o link recebido ou tente novamente em instantes.</p>
           <div className={actions}>
             <Link className={botaoAcao} to="/agendar">
               Escolher outro horário
@@ -127,13 +127,13 @@ export function BookingStatusPage(): React.ReactElement {
         {booking.status === 'PENDING_PAYMENT' && (
           <>
             <IconeAguardando />
-            <h1 className={titulo}>A aguardar confirmação do pagamento...</h1>
+            <h1 className={titulo}>Aguardando a confirmação do pagamento...</h1>
             <p className={descricao}>
-              Assim que o Mercado Pago concluir o processamento, esta página atualiza automaticamente e confirma a sua marcação.
+              Assim que o Mercado Pago concluir o processamento, esta página se atualiza automaticamente e confirma a sua reserva.
             </p>
             <div className={infoPainel}>
               <div className={infoLinha}>
-                <span className={infoLabel}>Estado atual</span>
+                <span className={infoLabel}>Status atual</span>
                 <span className={infoValor}>Pagamento pendente</span>
               </div>
               {booking.service?.name && (
@@ -174,9 +174,9 @@ export function BookingStatusPage(): React.ReactElement {
         {booking.status === 'CONFIRMED' && (
           <>
             <IconeConfirmado />
-            <h1 className={titulo}>A sua marcação está confirmada!</h1>
+            <h1 className={titulo}>Sua reserva está confirmada!</h1>
             <p className={descricao}>
-              Enviámos um e-mail com os detalhes. Pode guardar esta página como referência do seu atendimento.
+              Enviamos um e-mail com os detalhes. Guarde esta página como referência do seu atendimento.
             </p>
             <div className={infoPainel}>
               <div className={infoLinha}>
@@ -202,7 +202,7 @@ export function BookingStatusPage(): React.ReactElement {
                 </div>
               )}
               <div className={infoLinha}>
-                <span className={infoLabel}>Estado</span>
+                <span className={infoLabel}>Status</span>
                 <span className={infoValor}>Pago e Confirmado</span>
               </div>
             </div>

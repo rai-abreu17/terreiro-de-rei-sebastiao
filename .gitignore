@@ -8,6 +8,13 @@ dist-ssr/
 # TypeScript build info
 *.tsbuildinfo
 
+# Artefatos compilados do vite.config (gerados pelo tsc -b)
+vite.config.js
+vite.config.d.ts
+
+# Scaffolding shadcn/Lovable sem uso
+components.json
+
 # Environment variables
 .env
 .env.local

@@ -123,12 +123,12 @@ const stepButtonBase = style({
 export const stepButton = styleVariants({
   ativa: [stepButtonBase, {
     borderColor: tokens.color.primaria,
-    backgroundColor: 'color-mix(in srgb, #6B1A1A 6%, #FFFFFF)',
+    backgroundColor: `color-mix(in srgb, ${tokens.color.primaria} 6%, ${tokens.color.fundo})`,
     color: tokens.color.primaria,
   }],
   concluida: [stepButtonBase, {
-    borderColor: 'color-mix(in srgb, #C9A84C 58%, #E5E2DD)',
-    backgroundColor: 'color-mix(in srgb, #C9A84C 10%, #FFFFFF)',
+    borderColor: `color-mix(in srgb, ${tokens.color.acento.dourado} 58%, ${tokens.color.neutral[200]})`,
+    backgroundColor: `color-mix(in srgb, ${tokens.color.acento.dourado} 10%, ${tokens.color.fundo})`,
     color: tokens.color.secundaria,
   }],
   pendente: [stepButtonBase, {
@@ -140,7 +140,7 @@ export const stepButton = styleVariants({
   }],
   erro: [stepButtonBase, {
     borderColor: tokens.color.estado.erro,
-    backgroundColor: 'color-mix(in srgb, #C0392B 8%, #FFFFFF)',
+    backgroundColor: `color-mix(in srgb, ${tokens.color.estado.erro} 8%, ${tokens.color.fundo})`,
     color: tokens.color.estado.erro,
   }],
 });

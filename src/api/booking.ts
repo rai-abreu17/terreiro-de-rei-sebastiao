@@ -81,15 +81,9 @@ export function resolveBookingCheckoutUrl(
 export async function createBooking(
   requisicao: BookingPayload
 ): Promise<BookingResponse> {
-  const idempotencyKey = crypto.randomUUID();
   const { data } = await apiClient.post<BookingResponseWire>(
     '/public/bookings',
-    requisicao,
-    {
-    headers: {
-      'Idempotency-Key': idempotencyKey,
-    },
-    }
+    requisicao
   );
 
   return normalizeBookingResponse(data);

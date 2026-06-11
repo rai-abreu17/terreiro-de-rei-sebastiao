@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import type { AuthStore } from './authStore.types';
 import { ESTADO_INICIAL_AUTH } from './authStore.types';
 
-const criarEstado: StateCreator<AuthStore> = (set) => ({
+const criarEstado: StateCreator<AuthStore, [['zustand/devtools', never]], []> = (set) => ({
   ...ESTADO_INICIAL_AUTH,
 
   iniciarCarregamentoSessao: () =>
@@ -64,7 +64,5 @@ const criarEstado: StateCreator<AuthStore> = (set) => ({
 });
 
 export const useAuthStore = create<AuthStore>()(
-  import.meta.env.DEV
-    ? devtools(criarEstado, { name: 'AuthStore' })
-    : criarEstado
+  devtools(criarEstado, { name: 'AuthStore', enabled: import.meta.env.DEV })
 );

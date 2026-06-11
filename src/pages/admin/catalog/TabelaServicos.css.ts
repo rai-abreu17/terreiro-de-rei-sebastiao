@@ -67,7 +67,7 @@ export const filtroSelect = style({
 export const tabelaWrapper = style({
   overflowX: 'auto',
   borderRadius: 8,
-  border: `1px solid #e5e5e5`,
+  border: `1px solid ${tokens.color.neutral[200]}`,
   backgroundColor: tokens.color.fundo,
   boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
 });
@@ -80,7 +80,7 @@ export const tabela = style({
 });
 
 export const cabecalhoTabela = style({
-  backgroundColor: '#f9f9fb',
+  backgroundColor: tokens.color.neutral[50],
   position: 'sticky',
   top: 0,
   zIndex: 1,
@@ -94,7 +94,7 @@ export const celulaHeader = style({
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   color: tokens.color.texto.secundario,
-  borderBottom: '1px solid #e5e5e5',
+  borderBottom: `1px solid ${tokens.color.neutral[200]}`,
   whiteSpace: 'nowrap',
   userSelect: 'none',
 });
@@ -102,11 +102,11 @@ export const celulaHeader = style({
 export const linhaTabela = style({
   transition: 'background-color 0.15s ease',
   ':hover': {
-    backgroundColor: '#faf5f5',
+    backgroundColor: tokens.color.neutral[50],
   },
   selectors: {
     '&:not(:last-child)': {
-      borderBottom: '1px solid #f0f0f0',
+      borderBottom: `1px solid ${tokens.color.neutral[200]}`,
     },
   },
 });
@@ -233,7 +233,7 @@ export const botaoPublicar = style([
     color: tokens.color.fundo,
     backgroundColor: tokens.color.estado.sucesso,
     ':hover': {
-      backgroundColor: '#166B35',
+      backgroundColor: `color-mix(in srgb, ${tokens.color.estado.sucesso} 80%, ${tokens.color.neutral[800]})`,
     },
   },
 ]);
@@ -268,7 +268,7 @@ export const botaoPrimario = style([
     color: tokens.color.fundo,
     backgroundColor: tokens.color.primaria,
     ':hover': {
-      backgroundColor: '#5A1515',
+      backgroundColor: tokens.color.brand.primaryHover,
     },
   },
 ]);
@@ -294,10 +294,10 @@ export const botaoPagina = style([
   {
     color: tokens.color.texto.secundario,
     backgroundColor: 'transparent',
-    border: `1px solid #e0e0e0`,
+    border: `1px solid ${tokens.color.neutral[200]}`,
     padding: '6px 14px',
     ':hover': {
-      backgroundColor: '#f5f5f5',
+      backgroundColor: tokens.color.neutral[50],
     },
   },
 ]);
@@ -322,7 +322,7 @@ const pulsar = keyframes({
 export const skeleton = style({
   height: 14,
   borderRadius: 4,
-  backgroundColor: '#e8e8e8',
+  backgroundColor: tokens.color.neutral[200],
   animation: `${pulsar} 1.5s ease-in-out infinite`,
 });
 
@@ -332,7 +332,7 @@ export const skeletonLinha = style({
   padding: '14px 16px',
   selectors: {
     '&:not(:last-child)': {
-      borderBottom: '1px solid #f0f0f0',
+      borderBottom: `1px solid ${tokens.color.neutral[200]}`,
     },
   },
 });

@@ -335,7 +335,7 @@ function ServiceRow({ service, idConfirmacaoAtiva, onAbrirConfirmacao }: Service
   const estaConfirmandoToggle = idConfirmacaoAtiva === service.id;
 
   // ── Toggle: abrir confirmação (uma por vez) ──────────
-  const handleToggleClick = useCallback((e: React.MouseEvent) => {
+  const handleToggleClick = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation();
     if (estaConfirmandoToggle) {
       onAbrirConfirmacao(null);
@@ -457,7 +457,7 @@ function ServiceRow({ service, idConfirmacaoAtiva, onAbrirConfirmacao }: Service
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              handleToggleClick(e as any);
+              handleToggleClick(e);
             }
           }}
         >

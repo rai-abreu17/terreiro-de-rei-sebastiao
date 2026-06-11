@@ -150,7 +150,7 @@ export const botaoAcao = style({
   selectors: {
     '&:hover:not(:disabled)': {
       transform: 'translateY(-2px)',
-      backgroundColor: '#521414',
+      backgroundColor: tokens.color.brand.primaryHover,
     },
     '&:disabled': {
       opacity: 0.5,

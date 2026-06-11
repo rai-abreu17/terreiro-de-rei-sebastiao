@@ -15,7 +15,7 @@ import { ServiceCategoryPage } from './pages/public/ServiceCategoryPage/ServiceC
 import { ServiceDetailPage } from './pages/public/ServiceDetailPage/ServiceDetailPage';
 import { PublicLayout } from './layouts/PublicLayout';
 
-export const rotas = createBrowserRouter([
+const rotas = createBrowserRouter([
   {
     path: '/',
     element: (
